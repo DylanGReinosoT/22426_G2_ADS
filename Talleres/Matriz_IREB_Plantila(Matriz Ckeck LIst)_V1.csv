@@ -1,0 +1,25 @@
+;MATRIZ PARA COMPROBACIÓN REQUERIMIENTOS DE CALIDAD DE PROYECTO ACADEMICO;;;;;;
+;;;;;;;
+;;SITEMA:;DESARROLLO DE UN SITEMA DE gestion de inventario de materia prima de la empresa Pintauto;;;;
+;;;;Requerimientos  Funcionales;;;
+Nº;CRITERIOS DE CALIDAD (Documento/Requerimientos);;"Status
+Nivel de Acuerdo";"
+RE01 Registrar Materia Prima";100;RE02 Actualizar MP;RE03 Crear una Orden de trabajo
+;;;;;0;;
+1;Agreed;;OK;"1. Minutas y actas firmadas de la elicitacitación de requisitos
+2. Se efectuan Casos de Prueba  
+3. Acta de Entrega - Recepción del producto ";1;"1. Minutas y actas firmadas de la elicitacitación de requisitos
+2. Se efectuan Casos de Prueba 
+3, Acta de Entrega - Recepción del producto ";"1. Minutas y actas firmadas de la elicitacitación de requisitos
+2. Se efectuan Casos de Prueba 
+3, Acta de Entrega - Recepción del producto "
+2;Ranked;;OK;El requisito si posee un orden de prioridad 2;;El requisito si posee un orden de prioridad 3;El requisito si posee un orden de prioridad 5
+3;Unambiguos;;OK;El requisito es claro y no posee multiples interprestaciones, se adjutnta evidencia en un video.;;El requisito es claro y no posee multiples interprestaciones, se adjutnta evidencia en un video.;El requisito es claro y no posee multiples interprestaciones, se adjutnta evidencia en un video.
+4;Valid and up-to date;;OK;El requisito incorpora todos los requerimientos del usuario;;El requisito es claro y no posee multiples interprestaciones ;
+5;Correct;;OK;Al requisito no ser ambiguo, es correcto;;RE02 Actualizar MP;
+6;Consisten;;OK;El requisito es claro y no posee inconsistencias ;;;
+7;Verifiable;;OK;El requisito tiene como verificable que se visualice la informacion en el aplicativo;;;
+8;Realizable;;OK;El requisito se lo implementa en la fase inicial del aplicativo;;;
+9;Traceable;;PEND;Las relaciones con los posteriores requisitos esta clara dentro del documenro SRS, pero no se cuenta con una matriz de trazabilidad;;;
+10;Complete;;OK;El requisito es uno de los mas importantes al ser la base de todo los procesos del palicativo.;;;
+11;Understandability;;OK;Para la elicitacion de los requisitos estuvieron implicados, el cliente,  stakeholders y el grupo de Elicitadores de los requisitos ;;,;
