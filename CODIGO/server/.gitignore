@@ -1,0 +1,16 @@
+# Dependencias de Node
+node_modules/
+
+# Editor/IDE
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Archivos de entorno (variables de configuración)
+#.env
+#.env.local
+#.env.*.local
