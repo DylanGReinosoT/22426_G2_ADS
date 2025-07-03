@@ -16,7 +16,7 @@ public class MateriaPrima {
     private Long id;
 
     @NotBlank(message = "El nombre no puede estar vacío")
-    @Size(min = 3, max = 80, message = "El nombre no puede exceder los 100 caracteres")
+    @Size(min = 3, max = 80, message = "El nombre no puede exceder los 80 caracteres")
     @Column(nullable = false, length = 80)
     private String nombre;
 
