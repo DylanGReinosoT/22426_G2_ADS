@@ -1,3 +1,4 @@
-# _22426_G2_ADS
-📄 Consulta la [documentación](PREGAME/).
+# Evaluaciones Practicas - MVC y Arquitectura de 3 capas
+
+
 
