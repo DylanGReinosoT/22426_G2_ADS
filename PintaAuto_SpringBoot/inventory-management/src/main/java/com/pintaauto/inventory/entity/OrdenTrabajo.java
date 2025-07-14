@@ -48,6 +48,11 @@ public class OrdenTrabajo {
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
+    // Relación muchos a uno con Cliente (cliente asociado)
+    @ManyToOne
+    @JoinColumn(name = "cliente_id", nullable = false)
+    private Cliente cliente;
+
     // Relación muchos a muchos con MateriaPrima (materia prima utilizada)
     @ManyToMany
     @JoinTable(
@@ -64,10 +69,12 @@ public class OrdenTrabajo {
                         String titulo,
                         String descripcion,
                         Usuario usuario,
+                        Cliente cliente,
                         List<MateriaPrima> materiasPrimas) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.usuario = usuario;
+        this.cliente = cliente;
         this.materiasPrimas = materiasPrimas;
     }
 
@@ -135,6 +142,10 @@ public class OrdenTrabajo {
 
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
     }
 
     public List<MateriaPrima> getMateriasPrimas() {

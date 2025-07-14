@@ -19,16 +19,20 @@ public class OrdenTrabajoRequestDTO {
     @NotNull(message = "El usuario responsable es obligatorio")
     private Long usuarioId;
 
+    @NotNull(message = "El cliente es obligatorio")
+    private Long clienteId;
+
     @NotNull(message = "Debe especificar al menos una materia prima")
     private List<Long> materiasPrimasIds;
 
     // Constructores
 
 
-    public OrdenTrabajoRequestDTO(String titulo, String descripcion, Long usuarioId, List<Long> materiasPrimasIds) {
+    public OrdenTrabajoRequestDTO(String titulo, String descripcion, Long usuarioId, Long clienteId, List<Long> materiasPrimasIds) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.usuarioId = usuarioId;
+        this.clienteId = clienteId;
         this.materiasPrimasIds = materiasPrimasIds;
     }
 
@@ -46,6 +50,9 @@ public class OrdenTrabajoRequestDTO {
     public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
     }
+
+    public Long getClienteId() { return clienteId; }
+    public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
 
     public List<Long> getMateriasPrimasIds() { return materiasPrimasIds; }
     public void setMateriasPrimasIds(List<Long> materiasPrimasIds) { this.materiasPrimasIds = materiasPrimasIds; }

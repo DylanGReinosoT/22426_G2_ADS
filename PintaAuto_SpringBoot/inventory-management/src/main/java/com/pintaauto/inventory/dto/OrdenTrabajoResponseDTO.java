@@ -14,6 +14,7 @@ public class OrdenTrabajoResponseDTO {
     private LocalTime horaCreacion;
     private LocalTime horaFinalizacion;
     private UsuarioResponseDTO usuario;
+    private ClienteResponseDTO cliente;
     private List<MateriaPrimaResponseDTO> materiasPrimas;
 
     // Constructores
@@ -27,6 +28,7 @@ public class OrdenTrabajoResponseDTO {
                                    LocalTime horaCreacion,
                                    LocalTime horaFinalizacion,
                                    UsuarioResponseDTO usuario,
+                                   ClienteResponseDTO cliente,
                                    List<MateriaPrimaResponseDTO> materiasPrimas) {
         this.id = id;
         this.titulo = titulo;
@@ -36,6 +38,7 @@ public class OrdenTrabajoResponseDTO {
         this.horaCreacion = horaCreacion;
         this.horaFinalizacion = horaFinalizacion;
         this.usuario = usuario;
+        this.cliente = cliente;
         this.materiasPrimas = materiasPrimas;
     }
 
@@ -63,6 +66,9 @@ public class OrdenTrabajoResponseDTO {
 
     public UsuarioResponseDTO getUsuario() { return usuario; }
     public void setUsuario(UsuarioResponseDTO usuario) { this.usuario = usuario; }
+
+    public ClienteResponseDTO getCliente() { return cliente; }
+    public void setCliente(ClienteResponseDTO cliente) { this.cliente = cliente; }
 
     public List<MateriaPrimaResponseDTO> getMateriasPrimas() { return materiasPrimas; }
     public void setMateriasPrimas(List<MateriaPrimaResponseDTO> materiasPrimas) { this.materiasPrimas = materiasPrimas; }

@@ -1,5 +1,6 @@
 package com.pintaauto.inventory.repository;
 
+import com.pintaauto.inventory.entity.Cliente;
 import com.pintaauto.inventory.entity.OrdenTrabajo;
 import com.pintaauto.inventory.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,6 +21,9 @@ public interface OrdenTrabajoRepository extends JpaRepository<OrdenTrabajo, Long
 
     @Query("SELECT u FROM Usuario u WHERE u.id = :usuarioId")
     Usuario findUsuarioById(Long usuarioId);
+
+    @Query("SELECT c FROM Cliente c WHERE c.id = :clienteId")
+    Cliente findClienteById(Long clienteId);
 
 
 }

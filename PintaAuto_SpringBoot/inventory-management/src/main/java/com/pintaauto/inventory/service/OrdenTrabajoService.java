@@ -1,13 +1,12 @@
 package com.pintaauto.inventory.service;
 
 
-import com.pintaauto.inventory.dto.MateriaPrimaResponseDTO;
-import com.pintaauto.inventory.dto.OrdenTrabajoRequestDTO;
-import com.pintaauto.inventory.dto.OrdenTrabajoResponseDTO;
-import com.pintaauto.inventory.dto.UsuarioResponseDTO;
+import com.pintaauto.inventory.dto.*;
+import com.pintaauto.inventory.entity.Cliente;
 import com.pintaauto.inventory.entity.MateriaPrima;
 import com.pintaauto.inventory.entity.OrdenTrabajo;
 import com.pintaauto.inventory.entity.Usuario;
+import com.pintaauto.inventory.repository.ClienteRepository;
 import com.pintaauto.inventory.repository.MateriaPrimaRepository;
 import com.pintaauto.inventory.service.UsuarioService;
 import com.pintaauto.inventory.repository.OrdenTrabajoRepository;
@@ -24,6 +23,10 @@ public class OrdenTrabajoService{
 
     @Autowired
     UsuarioService usuarioService;
+    @Autowired
+    ClienteService clienteService;
+    @Autowired
+    ClienteRepository clienteRepository;
     @Autowired
     private OrdenTrabajoRepository ordenTrabajoRepository;
 
@@ -112,6 +115,9 @@ public class OrdenTrabajoService{
         // Suponiendo que tienes un método para convertir Usuario a UsuarioResponseDTO
         UsuarioResponseDTO usuarioDTO = usuarioService.convertirAResponseDTO(ordenTrabajo.getUsuario());
 
+        // Suponiendo que tienes un método para convertir Cliente a ClienteResponseDTO
+        ClienteResponseDTO clienteDTO = clienteService.convertirAResponseDTO(ordenTrabajo.getCliente());
+
         // Suponiendo que tienes un método para convertir MateriaPrima a MateriaPrimaResponseDTO
         List<MateriaPrimaResponseDTO> materiasPrimasDTO = ordenTrabajo.getMateriasPrimas().stream()
             .map(this::convertirMateriaPrimaAResponseDTO)
@@ -126,6 +132,7 @@ public class OrdenTrabajoService{
             ordenTrabajo.getHoraCreacion(),
             ordenTrabajo.getHoraFinalizacion(),
             usuarioDTO,
+            clienteDTO,
             materiasPrimasDTO
         );
     }
@@ -148,13 +155,17 @@ public class OrdenTrabajoService{
 
     private OrdenTrabajo convertirAEntidad(OrdenTrabajoRequestDTO requestDTO){
         Usuario user = new Usuario();
+        // En tu servicio
+        Cliente cliente = new Cliente();
         user = ordenTrabajoRepository.findUsuarioById(requestDTO.getUsuarioId());
         // Recuperar todas las materias primas por sus IDs
+        cliente = ordenTrabajoRepository.findClienteById(requestDTO.getClienteId());
         List<MateriaPrima> materiasPrimas = materiaPrimaRepository.findAllById(requestDTO.getMateriasPrimasIds());
         return new OrdenTrabajo(
             requestDTO.getTitulo(),
             requestDTO.getDescripcion(),
             user,
+            cliente,
             materiasPrimas
         );
     }
