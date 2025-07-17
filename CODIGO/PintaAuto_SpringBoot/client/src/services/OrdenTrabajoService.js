@@ -21,4 +21,6 @@ const ordenTrabajoService = {
         const response = await api.delete(`/ordenes/${id}`);
         return response.data;
     }
-}
+};
+
+export default ordenTrabajoService;

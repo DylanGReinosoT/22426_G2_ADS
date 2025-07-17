@@ -1,25 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-//import ordenTrabajoService from '../services/OrdenTrabajoService'
+import ordenTrabajoService from '../services/OrdenTrabajoService'
 import { FiEdit, FiTrash2, FiPlus, FiEye } from 'react-icons/fi'
 
 const OrdenesTrabajo = () => {
-  const [ordenes, setOrdenes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
-  const [currentOrden, setCurrentOrden] = useState(null)
+  const [ordenes, setOrdenes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [currentOrden, setCurrentOrden] = useState(null);
   const navigate = useNavigate()
 
   const cargarOrdenes = async () => {
     try {
-      const res = await ordenTrabajoService.obtenerTodas()
-      setOrdenes(res.datos.ordenes)
+      // setLoading(true)
+      const res = await ordenTrabajoService.obtenerTodas();
+      console.log('Ordenes cargadas:', res.datos);
+      setOrdenes(res.datos || []);
+      
+      // setOrdenes(res.datos.ordenes)
     } catch (error) {
       console.error('Error al cargar órdenes:', error)
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     cargarOrdenes()
@@ -80,7 +84,7 @@ const OrdenesTrabajo = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{orden.titulo}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{orden.descripcion}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{orden.usuario?.nombre || 'N/A'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{orden.cliente?.nombre || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{`${orden.cliente?.nombre.split(' ')[0]} ${orden.cliente?.apellido.split(' ')[0]}` || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 py-1 text-xs rounded-full ${
                       orden.estado === 'COMPLETADA' ? 'bg-green-100 text-green-800' :

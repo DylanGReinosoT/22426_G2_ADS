@@ -60,6 +60,7 @@ const MateriaPrima = () => {
   const cargarMaterias = async () => {
     try {
       const res = await materiaPrimaService.obtenerTodas();
+      console.log('res: ',res);
       setMateriaPrima(res.datos.materias); // asegúrate de que la estructura del backend es correcta
     } catch (error) {
       console.error('Error al cargar materias primas:', error);

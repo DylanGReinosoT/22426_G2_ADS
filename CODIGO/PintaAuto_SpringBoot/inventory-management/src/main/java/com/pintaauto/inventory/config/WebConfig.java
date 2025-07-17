@@ -1,5 +1,6 @@
 package com.pintaauto.inventory.config;
 
+// Archivo: src/main/java/tu/paquete/config/WebConfig.java
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -12,10 +13,11 @@ public class WebConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                    .allowedOriginPatterns("http://localhost:5173") // Cambia por el origen de tu frontend
-                    .allowedMethods("GET", "POST", "PUT", "DELETE")
-                    .allowCredentials(true);
+                registry.addMapping("/api/**")
+                        .allowedOrigins("http://localhost:5174")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
             }
         };
     }
