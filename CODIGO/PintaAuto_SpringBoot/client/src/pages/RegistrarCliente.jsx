@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import clienteService from '../services/ClienteService'
 import { FiUser, FiUserCheck, FiCreditCard, FiCalendar, FiPhone, FiMail, FiMapPin, FiSave, FiX } from 'react-icons/fi'
+import { motion } from 'framer-motion'
 
 const RegistrarCliente = () => {
   const [cliente, setCliente] = useState({
@@ -77,6 +78,10 @@ const RegistrarCliente = () => {
     e.preventDefault()
     
     if (!validateForm()) {
+      // Animación de sacudida para errores
+      const form = e.target
+      form.classList.add('animate-shake')
+      setTimeout(() => form.classList.remove('animate-shake'), 500)
       return
     }
 
@@ -96,6 +101,7 @@ const RegistrarCliente = () => {
         direccion: ''
       })
       
+      // Animación de éxito
       alert('Cliente registrado exitosamente')
       navigate('/dashboard/cliente')
     } catch (error) {
@@ -106,33 +112,96 @@ const RegistrarCliente = () => {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Encabezado con gradiente */}
-        <div className="bg-gradient-to-r from-black to-red-900 rounded-t-xl shadow-lg p-6 text-white">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold flex items-center gap-3">
-              <FiUser className="text-red-400" />
-              Registrar Nuevo Cliente
-            </h2>
-            <button 
-              onClick={() => navigate('/dashboard/cliente')}
-              className="p-2 rounded-full hover:bg-red-800 transition-colors"
-            >
-              <FiX size={20} />
-            </button>
-          </div>
-        </div>
+  // Animaciones
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delay: 0.1,
+        when: "beforeChildren",
+        staggerChildren: 0.1
+      }
+    }
+  }
 
-        {/* Formulario */}
-        <div className="bg-white rounded-b-xl shadow-lg p-8">
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        type: "spring",
+        stiffness: 100
+      }
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 py-8 px-4">
+      {/* Efecto de partículas sutiles */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div 
+            key={i}
+            className="absolute rounded-full bg-red-500 opacity-10"
+            style={{
+              width: Math.random() * 10 + 5 + 'px',
+              height: Math.random() * 10 + 5 + 'px',
+              top: Math.random() * 100 + '%',
+              left: Math.random() * 100 + '%',
+              animation: `float ${Math.random() * 10 + 10}s linear infinite`,
+              animationDelay: Math.random() * 5 + 's'
+            }}
+          />
+        ))}
+      </div>
+
+      <motion.div 
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="max-w-4xl mx-auto relative z-10"
+      >
+        {/* Encabezado con gradiente y efecto de brillo */}
+        <motion.div 
+          variants={itemVariants}
+          className="relative overflow-hidden rounded-t-xl shadow-2xl"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-red-900 to-black opacity-90"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMCwwLDAuMDUpIj48L3JlY3Q+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3BhdHRlcm4pIj48L3JlY3Q+PC9zdmc+')] opacity-30"></div>
+          <div className="relative p-6 text-white">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold flex items-center gap-3">
+                <FiUser className="text-red-400 animate-pulse" />
+                Registrar Nuevo Cliente
+              </h2>
+              <motion.button 
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => navigate('/dashboard/cliente')}
+                className="p-2 rounded-full hover:bg-red-800 transition-all bg-black bg-opacity-30"
+              >
+                <FiX size={20} />
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Formulario con efecto de vidrio esmerilado */}
+        <motion.div 
+          variants={itemVariants}
+          className="bg-white bg-opacity-10 backdrop-blur-lg rounded-b-xl shadow-2xl p-8 border border-white border-opacity-10"
+        >
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nombre y Apellido */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="group">
-                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
-                  <FiUser className="text-red-600 group-hover:text-red-700 transition-colors" />
+              <motion.div 
+                variants={itemVariants}
+                className="group"
+              >
+                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                  <FiUser className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Nombre *
                 </label>
                 <div className="relative">
@@ -141,22 +210,29 @@ const RegistrarCliente = () => {
                     name="nombre"
                     value={cliente.nombre}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
-                      errors.nombre ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                      errors.nombre ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese el nombre"
                   />
                 </div>
                 {errors.nombre && (
-                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-sm mt-1 flex items-center gap-1"
+                  >
                     <FiX size={14} /> {errors.nombre}
-                  </p>
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
 
-              <div className="group">
-                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
-                  <FiUserCheck className="text-red-600 group-hover:text-red-700 transition-colors" />
+              <motion.div 
+                variants={itemVariants}
+                className="group"
+              >
+                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                  <FiUserCheck className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Apellido *
                 </label>
                 <div className="relative">
@@ -165,25 +241,32 @@ const RegistrarCliente = () => {
                     name="apellido"
                     value={cliente.apellido}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
-                      errors.apellido ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                      errors.apellido ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese el apellido"
                   />
                 </div>
                 {errors.apellido && (
-                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-sm mt-1 flex items-center gap-1"
+                  >
                     <FiX size={14} /> {errors.apellido}
-                  </p>
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
             </div>
 
             {/* Cédula y Fecha de Nacimiento */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="group">
-                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
-                  <FiCreditCard className="text-red-600 group-hover:text-red-700 transition-colors" />
+              <motion.div 
+                variants={itemVariants}
+                className="group"
+              >
+                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                  <FiCreditCard className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Cédula *
                 </label>
                 <div className="relative">
@@ -192,23 +275,30 @@ const RegistrarCliente = () => {
                     name="cedula"
                     value={cliente.cedula}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
-                      errors.cedula ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                      errors.cedula ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese la cédula (10 dígitos)"
                     maxLength={10}
                   />
                 </div>
                 {errors.cedula && (
-                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-sm mt-1 flex items-center gap-1"
+                  >
                     <FiX size={14} /> {errors.cedula}
-                  </p>
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
 
-              <div className="group">
-                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
-                  <FiCalendar className="text-red-600 group-hover:text-red-700 transition-colors" />
+              <motion.div 
+                variants={itemVariants}
+                className="group"
+              >
+                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                  <FiCalendar className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Fecha de Nacimiento *
                 </label>
                 <div className="relative">
@@ -217,24 +307,31 @@ const RegistrarCliente = () => {
                     name="fechaNacimiento"
                     value={cliente.fechaNacimiento}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
-                      errors.fechaNacimiento ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                      errors.fechaNacimiento ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                   />
                 </div>
                 {errors.fechaNacimiento && (
-                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-sm mt-1 flex items-center gap-1"
+                  >
                     <FiX size={14} /> {errors.fechaNacimiento}
-                  </p>
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
             </div>
 
             {/* Teléfono y Email */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="group">
-                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
-                  <FiPhone className="text-red-600 group-hover:text-red-700 transition-colors" />
+              <motion.div 
+                variants={itemVariants}
+                className="group"
+              >
+                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                  <FiPhone className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Teléfono *
                 </label>
                 <div className="relative">
@@ -243,23 +340,30 @@ const RegistrarCliente = () => {
                     name="telefono"
                     value={cliente.telefono}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
-                      errors.telefono ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                      errors.telefono ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese el teléfono (10 dígitos)"
                     maxLength={10}
                   />
                 </div>
                 {errors.telefono && (
-                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-sm mt-1 flex items-center gap-1"
+                  >
                     <FiX size={14} /> {errors.telefono}
-                  </p>
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
 
-              <div className="group">
-                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
-                  <FiMail className="text-red-600 group-hover:text-red-700 transition-colors" />
+              <motion.div 
+                variants={itemVariants}
+                className="group"
+              >
+                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                  <FiMail className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Email *
                 </label>
                 <div className="relative">
@@ -268,24 +372,31 @@ const RegistrarCliente = () => {
                     name="email"
                     value={cliente.email}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
-                      errors.email ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                      errors.email ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese el email"
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-400 text-sm mt-1 flex items-center gap-1"
+                  >
                     <FiX size={14} /> {errors.email}
-                  </p>
+                  </motion.p>
                 )}
-              </div>
+              </motion.div>
             </div>
 
             {/* Dirección */}
-            <div className="group">
-              <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
-                <FiMapPin className="text-red-600 group-hover:text-red-700 transition-colors" />
+            <motion.div 
+              variants={itemVariants}
+              className="group"
+            >
+              <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                <FiMapPin className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                 Dirección *
               </label>
               <div className="relative">
@@ -294,52 +405,85 @@ const RegistrarCliente = () => {
                   value={cliente.direccion}
                   onChange={handleChange}
                   rows={3}
-                  className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
-                    errors.direccion ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                  className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                    errors.direccion ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                   }`}
                   placeholder="Ingrese la dirección completa"
                 />
               </div>
               {errors.direccion && (
-                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                <motion.p 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-sm mt-1 flex items-center gap-1"
+                >
                   <FiX size={14} /> {errors.direccion}
-                </p>
+                </motion.p>
               )}
-            </div>
+            </motion.div>
 
             {/* Botones */}
-            <div className="flex justify-end space-x-4 pt-6">
-              <button
+            <motion.div 
+              variants={itemVariants}
+              className="flex justify-end space-x-4 pt-6"
+            >
+              <motion.button
                 type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => navigate('/dashboard/cliente')}
-                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-all font-medium"
+                className="px-6 py-3 border-2 border-gray-600 text-gray-200 rounded-lg hover:bg-black hover:bg-opacity-30 hover:border-red-500 transition-all font-medium shadow-md"
               >
                 Cancelar
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 type="submit"
                 disabled={loading}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg hover:from-red-700 hover:to-red-900 transition-all shadow-md hover:shadow-lg font-medium disabled:opacity-70"
+                whileHover={{ scale: loading ? 1 : 1.05 }}
+                whileTap={{ scale: loading ? 1 : 0.95 }}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white rounded-lg hover:from-red-700 hover:via-red-800 hover:to-red-900 transition-all shadow-lg hover:shadow-red-900/50 font-medium disabled:opacity-70 relative overflow-hidden group"
               >
-                {loading ? (
-                  <>
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Guardando...
-                  </>
-                ) : (
-                  <>
-                    <FiSave size={18} />
-                    Guardar Cliente
-                  </>
-                )}
-              </button>
-            </div>
+                <span className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span className="relative z-10 flex items-center gap-2">
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Guardando...
+                    </>
+                  ) : (
+                    <>
+                      <FiSave size={18} className="transform group-hover:scale-110 transition-transform" />
+                      Guardar Cliente
+                    </>
+                  )}
+                </span>
+              </motion.button>
+            </motion.div>
           </form>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
+
+      {/* Agregar estilos de animación */}
+      <style jsx global>{`
+        @keyframes float {
+          0% { transform: translateY(0) rotate(0deg); opacity: 0.1; }
+          50% { transform: translateY(-20px) rotate(180deg); opacity: 0.3; }
+          100% { transform: translateY(0) rotate(360deg); opacity: 0.1; }
+        }
+        
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+          20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .animate-shake {
+          animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+      `}</style>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ordenTrabajoService from '../services/OrdenTrabajoService'
 import { FiEdit, FiTrash2, FiPlus, FiEye } from 'react-icons/fi'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const OrdenesTrabajo = () => {
   const [ordenes, setOrdenes] = useState([]);
@@ -12,12 +13,9 @@ const OrdenesTrabajo = () => {
 
   const cargarOrdenes = async () => {
     try {
-      // setLoading(true)
       const res = await ordenTrabajoService.obtenerTodas();
       console.log('Ordenes cargadas:', res.datos);
       setOrdenes(res.datos || []);
-      
-      // setOrdenes(res.datos.ordenes)
     } catch (error) {
       console.error('Error al cargar órdenes:', error)
     } finally {
@@ -46,155 +44,229 @@ const OrdenesTrabajo = () => {
   }
 
   if (loading) return (
-    <div className="flex justify-center items-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+    <div className="flex justify-center items-center h-screen bg-gradient-to-br from-black to-red-900">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        className="rounded-full h-16 w-16 border-t-4 border-b-4 border-red-500"
+      ></motion.div>
     </div>
   )
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-gray-800">Órdenes de Trabajo</h2>
+    <div className="min-h-screen p-6 bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="flex justify-between items-center mb-8">
+        <motion.h2 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-3xl font-bold text-white"
+        >
+          Órdenes de Trabajo
+        </motion.h2>
+        
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => navigate('/ordenes-trabajo/nueva')}
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-700 to-red-900 text-white rounded-lg shadow-lg hover:shadow-red-500/30 transition-all"
+        >
+          <FiPlus className="text-lg" />
+          Nueva Orden
+        </motion.button>
       </div>
 
-      <div className="bg-gradient-to-r bg-white rounded-lg shadow overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-2xl overflow-hidden border border-gray-700"
+      >
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-700">
+            <thead className="bg-gradient-to-r from-black to-red-900">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Título</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responsable</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">ID</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Título</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Descripción</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Responsable</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Cliente</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Estado</th>
+                <th className="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Acciones</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-700">
               {ordenes.map((orden) => (
-                <tr key={orden.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{orden.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{orden.titulo}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{orden.descripcion}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{orden.usuario?.nombre || 'N/A'}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{`${orden.cliente?.nombre.split(' ')[0]} ${orden.cliente?.apellido.split(' ')[0]}` || 'N/A'}</td>
+                <motion.tr 
+                  key={orden.id}
+                  whileHover={{ 
+                    backgroundColor: 'rgba(127, 29, 29, 0.1)',
+                    transition: { duration: 0.2 }
+                  }}
+                  className="bg-gray-800/50 hover:bg-gray-800/80 transition-colors"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-300">{orden.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">{orden.titulo}</td>
+                  <td className="px-6 py-4 text-sm text-gray-400 max-w-xs truncate">{orden.descripcion}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{orden.usuario?.nombre || 'N/A'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{`${orden.cliente?.nombre.split(' ')[0]} ${orden.cliente?.apellido.split(' ')[0]}` || 'N/A'}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      orden.estado === 'COMPLETADA' ? 'bg-green-100 text-green-800' :
-                      orden.estado === 'EN_PROCESO' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
+                    <motion.span 
+                      whileHover={{ scale: 1.05 }}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-full ${
+                        orden.estado === 'COMPLETADA' ? 'bg-green-900/50 text-green-300' :
+                        orden.estado === 'EN_PROCESO' ? 'bg-yellow-900/50 text-yellow-300' :
+                        'bg-gray-700 text-gray-300'
+                      }`}
+                    >
                       {orden.estado?.replace('_', ' ') || 'PENDIENTE'}
-                    </span>
+                    </motion.span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
-                    <button
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-3">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => openDetailsModal(orden)}
-                      className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
+                      className="p-2 bg-gray-700 rounded-lg hover:bg-blue-600/30 text-blue-400 hover:text-blue-300 transition-all"
                       title="Ver detalles"
                     >
                       <FiEye />
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => navigate(`/ordenes-trabajo/editar/${orden.id}`)}
-                      className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50"
+                      className="p-2 bg-gray-700 rounded-lg hover:bg-purple-600/30 text-purple-400 hover:text-purple-300 transition-all"
                       title="Editar"
                     >
                       <FiEdit />
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
                       onClick={() => handleDelete(orden.id)}
-                      className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50"
+                      className="p-2 bg-gray-700 rounded-lg hover:bg-red-600/30 text-red-400 hover:text-red-300 transition-all"
                       title="Eliminar"
                     >
                       <FiTrash2 />
-                    </button>
+                    </motion.button>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </motion.div>
 
       {/* Modal de Detalles */}
-      {showModal && currentOrden && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-semibold">Detalles de Orden #{currentOrden.id}</h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <h4 className="font-medium text-gray-700 mb-2">Información Básica</h4>
-                <div className="space-y-2">
-                  <p><span className="font-medium">Título:</span> {currentOrden.titulo}</p>
-                  <p><span className="font-medium">Descripción:</span> {currentOrden.descripcion}</p>
-                  <p><span className="font-medium">Estado:</span> 
-                    <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
-                      currentOrden.estado === 'COMPLETADA' ? 'bg-green-100 text-green-800' :
-                      currentOrden.estado === 'EN_PROCESO' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {currentOrden.estado?.replace('_', ' ') || 'PENDIENTE'}
-                    </span>
-                  </p>
+      <AnimatePresence>
+        {showModal && currentOrden && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl shadow-2xl border border-gray-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-red-500 to-red-700 bg-clip-text text-transparent">
+                  Detalles de Orden #{currentOrden.id}
+                </h3>
+                <motion.button
+                  whileHover={{ rotate: 90, scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowModal(false)}
+                  className="text-gray-400 hover:text-white text-xl"
+                >
+                  ✕
+                </motion.button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                  <h4 className="font-semibold text-lg mb-3 bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+                    Información Básica
+                  </h4>
+                  <div className="space-y-3">
+                    <p className="text-gray-300"><span className="font-medium text-white">Título:</span> {currentOrden.titulo}</p>
+                    <p className="text-gray-300"><span className="font-medium text-white">Descripción:</span> {currentOrden.descripcion}</p>
+                    <div className="flex items-center">
+                      <span className="font-medium text-white mr-2">Estado:</span>
+                      <motion.span 
+                        whileHover={{ scale: 1.05 }}
+                        className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                          currentOrden.estado === 'COMPLETADA' ? 'bg-green-900/50 text-green-300' :
+                          currentOrden.estado === 'EN_PROCESO' ? 'bg-yellow-900/50 text-yellow-300' :
+                          'bg-gray-700 text-gray-300'
+                        }`}
+                      >
+                        {currentOrden.estado?.replace('_', ' ') || 'PENDIENTE'}
+                      </motion.span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="font-semibold text-lg mb-3 bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+                    Responsables
+                  </h4>
+                  <div className="space-y-3">
+                    <p className="text-gray-300"><span className="font-medium text-white">Cliente:</span> {currentOrden.cliente?.nombre || 'N/A'}</p>
+                    <p className="text-gray-300"><span className="font-medium text-white">Responsable:</span> {currentOrden.usuario?.nombre || 'N/A'}</p>
+                    <p className="text-gray-300"><span className="font-medium text-white">Fecha creación:</span> {new Date(currentOrden.fechaCreacion).toLocaleDateString()}</p>
+                  </div>
                 </div>
               </div>
               
-              <div>
-                <h4 className="font-medium text-gray-700 mb-2">Responsables</h4>
-                <div className="space-y-2">
-                  <p><span className="font-medium">Cliente:</span> {currentOrden.cliente?.nombre || 'N/A'}</p>
-                  <p><span className="font-medium">Responsable:</span> {currentOrden.usuario?.nombre || 'N/A'}</p>
-                  <p><span className="font-medium">Fecha creación:</span> {new Date(currentOrden.fechaCreacion).toLocaleDateString()}</p>
+              <div className="mb-8">
+                <h4 className="font-semibold text-lg mb-3 bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
+                  Materias Primas a usar
+                </h4>
+                <div className="border border-gray-700 rounded-lg overflow-hidden">
+                  <table className="min-w-full divide-y divide-gray-700">
+                    <thead className="bg-gradient-to-r from-black to-red-900">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Nombre</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Cantidad</th>
+                        <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Unidad</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-700">
+                      {currentOrden.materiasPrimas?.map((mp) => (
+                        <motion.tr 
+                          key={mp.id}
+                          whileHover={{ backgroundColor: 'rgba(127, 29, 29, 0.1)' }}
+                          className="bg-gray-800/50"
+                        >
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{mp.nombre}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{mp.cantidad}</td>
+                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{mp.unidadMedida}</td>
+                        </motion.tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-700 mb-2">Materias Primas a usar</h4>
-              <div className="border rounded-lg overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Unidad</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {currentOrden.materiasPrimas?.map((mp) => (
-                      <tr key={mp.id}>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{mp.nombre}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{mp.cantidad}</td>
-                        <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">{mp.unidadMedida}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              
+              <div className="flex justify-end">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowModal(false)}
+                  className="px-6 py-2 bg-gradient-to-r from-gray-700 to-gray-800 text-white rounded-lg border border-gray-600 hover:border-red-500 transition-all"
+                >
+                  Cerrar
+                </motion.button>
               </div>
-            </div>
-            
-            <div className="mt-6 flex justify-end">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -95,14 +95,6 @@ const MateriaPrima = () => {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/')}
-            className="bg-gradient-to-r from-red-700 to-red-900 hover:from-red-800 hover:to-red-900 text-white font-semibold py-2 px-6 rounded-lg shadow-lg transition-all flex items-center gap-2"
-          >
-            <FiLogOut /> Cerrar Sesión
-          </motion.button>
           
           <motion.h2 
             initial={{ opacity: 0, y: -20 }}
