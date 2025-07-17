@@ -127,6 +127,7 @@ public class OrdenTrabajoService{
             ordenTrabajo.getId(),
             ordenTrabajo.getTitulo(),
             ordenTrabajo.getDescripcion(),
+            ordenTrabajo.getVehiculo(),
             ordenTrabajo.getFechaCreacion(),
             ordenTrabajo.getFechaFinalizacion(),
             ordenTrabajo.getHoraCreacion(),
@@ -164,6 +165,7 @@ public class OrdenTrabajoService{
         return new OrdenTrabajo(
             requestDTO.getTitulo(),
             requestDTO.getDescripcion(),
+            requestDTO.getVehiculo(),
             user,
             cliente,
             materiasPrimas

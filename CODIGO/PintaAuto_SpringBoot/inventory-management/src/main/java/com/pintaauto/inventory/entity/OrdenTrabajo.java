@@ -27,6 +27,10 @@ public class OrdenTrabajo {
     @Column(nullable = false)
     String descripcion;
 
+    @NotBlank(message = "la descripcion de vehiculo no puede estar vacío")
+    @Size(max = 255, message = "La descripcion de vehiculo debe tener un máximo de 255 caracteres")
+    String vehiculo;
+
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime fechaCreacion;
@@ -68,11 +72,13 @@ public class OrdenTrabajo {
     public OrdenTrabajo(
                         String titulo,
                         String descripcion,
+                        String vehiculo,
                         Usuario usuario,
                         Cliente cliente,
                         List<MateriaPrima> materiasPrimas) {
         this.titulo = titulo;
         this.descripcion = descripcion;
+        this.vehiculo = vehiculo;
         this.usuario = usuario;
         this.cliente = cliente;
         this.materiasPrimas = materiasPrimas;
@@ -103,6 +109,15 @@ public class OrdenTrabajo {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
+
+    public String getVehiculo() {
+        return vehiculo;
+    }
+
+    public void setVehiculo(String vehiculo) {
+        this.vehiculo = vehiculo;
+    }
+
 
     public LocalDateTime getFechaCreacion() {
         return fechaCreacion;

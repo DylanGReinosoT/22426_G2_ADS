@@ -9,6 +9,7 @@ public class OrdenTrabajoResponseDTO {
     private Long id;
     private String titulo;
     private String descripcion;
+    private String vehiculo;
     private LocalDateTime fechaCreacion;
     private LocalTime fechaFinalizacion;
     private LocalTime horaCreacion;
@@ -23,6 +24,7 @@ public class OrdenTrabajoResponseDTO {
     public OrdenTrabajoResponseDTO(Long id,
                                    String titulo,
                                    String descripcion,
+                                   String vehiculo,
                                    LocalDateTime fechaCreacion,
                                    LocalTime fechaFinalizacion,
                                    LocalTime horaCreacion,
@@ -33,6 +35,7 @@ public class OrdenTrabajoResponseDTO {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
+        this.vehiculo = vehiculo;
         this.fechaCreacion = fechaCreacion;
         this.fechaFinalizacion = fechaFinalizacion;
         this.horaCreacion = horaCreacion;
@@ -51,6 +54,9 @@ public class OrdenTrabajoResponseDTO {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public String getVehiculo() {return vehiculo;}
+    public void setVehiculo(String vehiculo) { this.vehiculo = vehiculo;}
 
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }

@@ -16,6 +16,10 @@ public class OrdenTrabajoRequestDTO {
     @Size(max = 255, message = "La descripción debe tener un máximo de 255 caracteres")
     private String descripcion;
 
+    @NotBlank(message = "la descripcion de vehiculo no puede estar vacío")
+    @Size(max = 255, message = "La descripcion de vehiculo debe tener un máximo de 255 caracteres")
+    private String vehiculo;
+
     @NotNull(message = "El usuario responsable es obligatorio")
     private Long usuarioId;
 
@@ -28,9 +32,10 @@ public class OrdenTrabajoRequestDTO {
     // Constructores
 
 
-    public OrdenTrabajoRequestDTO(String titulo, String descripcion, Long usuarioId, Long clienteId, List<Long> materiasPrimasIds) {
+    public OrdenTrabajoRequestDTO(String titulo, String descripcion, String vehiculo, Long usuarioId, Long clienteId, List<Long> materiasPrimasIds) {
         this.titulo = titulo;
         this.descripcion = descripcion;
+        this.vehiculo = vehiculo;
         this.usuarioId = usuarioId;
         this.clienteId = clienteId;
         this.materiasPrimasIds = materiasPrimasIds;
@@ -42,6 +47,9 @@ public class OrdenTrabajoRequestDTO {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public String getVehiculo() { return vehiculo; }
+    public void setVehiculo(String vehiculo) { this.vehiculo = vehiculo; }
 
     public Long getUsuarioId() {
         return usuarioId;
