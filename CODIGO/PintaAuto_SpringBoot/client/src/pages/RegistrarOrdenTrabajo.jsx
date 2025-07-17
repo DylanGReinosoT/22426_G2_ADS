@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ordenTrabajoService from '../services/OrdenTrabajoService'
 import materiaPrimaService from '../services/materiaPrimaService'
+import clienteService from '../services/ClienteService'
+// import usuarioService from '../services/UsuarioService'
 import { FiSave, FiArrowLeft, FiTruck, FiUser, FiTool, FiPackage } from 'react-icons/fi'
 
 const OrdenTrabajoForm = () => {
@@ -10,6 +12,8 @@ const OrdenTrabajoForm = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  
+  const [currentUser, setCurrentUser] = useState(null)
   
   const [formData, setFormData] = useState({
     titulo: '',
@@ -23,6 +27,29 @@ const OrdenTrabajoForm = () => {
   const [materiasPrimas, setMateriasPrimas] = useState([])
   const [clientes, setClientes] = useState([])
   const [usuarios, setUsuarios] = useState([])
+
+  useEffect(() => {
+    // Obtener usuario logueado desde localStorage
+    const obtenerUsuarioLogueado = () => {
+      try {
+        const userData = localStorage.getItem('user') || localStorage.getItem('userData')
+        if (userData) {
+          const user = JSON.parse(userData)
+          setCurrentUser(user)
+          // Establecer automáticamente el usuarioId en el formulario
+          setFormData(prev => ({ ...prev, usuarioId: user.id }))
+        } else {
+          // Si no hay usuario logueado, redirigir al login
+          navigate('/login')
+        }
+      } catch (error) {
+        console.error('Error obteniendo usuario logueado:', error)
+        navigate('/login')
+      }
+    }
+
+    obtenerUsuarioLogueado()
+  }, [navigate])
   
   useEffect(() => {
     const cargarDatos = async () => {
@@ -30,12 +57,12 @@ const OrdenTrabajoForm = () => {
         const [mpsRes, clientesRes, usuariosRes] = await Promise.all([
           materiaPrimaService.obtenerTodas(),
           clienteService.obtenerTodos(),
-          usuarioService.obtenerTodos()
+          // usuarioService.obtenerTodos()
         ])
         
         setMateriasPrimas(mpsRes.datos.materias)
-        setClientes(clientesRes.datos.clientes)
-        setUsuarios(usuariosRes.datos.usuarios)
+        setClientes(clientesRes.datos)
+        // setUsuarios(usuariosRes.datos.usuarios)
         
         if (id) {
           setIsEditMode(true)
@@ -45,7 +72,7 @@ const OrdenTrabajoForm = () => {
             titulo: orden.titulo,
             descripcion: orden.descripcion,
             vehiculo: orden.vehiculo || '',
-            usuarioId: orden.usuario.id,
+            // usuarioId: orden.usuario.id,
             clienteId: orden.cliente.id,
             materiasPrimasIds: orden.materiasPrimas.map(mp => mp.id)
           })
@@ -56,9 +83,11 @@ const OrdenTrabajoForm = () => {
         setLoading(false)
       }
     }
-    
-    cargarDatos()
-  }, [id])
+    // Solo cargar datos si ya tenemos el usuario
+    if (currentUser) {
+      cargarDatos()
+    }
+  }, [id, currentUser])
   
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -226,51 +255,128 @@ const OrdenTrabajoForm = () => {
                 <FiUser className="text-red-600 group-hover:text-red-700 transition-colors" /> 
                 Técnico Responsable *
               </label>
-              <select
-                name="usuarioId"
-                value={formData.usuarioId}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 appearance-none bg-white shadow-sm group-hover:shadow-md"
-                required
-              >
-                <option value="">Seleccionar técnico</option>
-                {usuarios.map(usuario => (
-                  <option key={usuario.id} value={usuario.id}>
-                    {usuario.nombre} {usuario.apellido || ''}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={currentUser ? `${currentUser.nombre} ${currentUser.apellido || ''}` : 'Cargando...'}
+                  readOnly
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                  placeholder="Usuario logueado"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                    Auto-asignado
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Se asigna automáticamente al usuario logueado
+              </p>
             </div>
           </div>
           
-          {/* Campo Materiales */}
+                    {/* Campo Materiales */}
           <div className="relative group">
             <label className="block text-gray-800 font-medium mb-1 flex items-center gap-2">
               <FiPackage className="text-red-600 group-hover:text-red-700 transition-colors" /> 
               Materiales a utilizar *
             </label>
-            <select
-              name="materiasPrimasIds"
-              multiple
-              value={formData.materiasPrimasIds}
-              onChange={handleMateriaPrimaChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white shadow-sm group-hover:shadow-md h-auto min-h-[100px]"
-              required
-            >
-              {materiasPrimas.map(mp => (
-                <option key={mp.id} value={mp.id}>
-                  {mp.nombre} - {mp.cantidad} {mp.unidadMedida} (${mp.precioUnitario?.toFixed(2) || '0.00'})
-                </option>
-              ))}
-            </select>
-            <div className="flex justify-between mt-1">
-              <p className="text-xs text-gray-500">
-                Mantén presionado Ctrl (Windows) o ⌘ (Mac) para seleccionar múltiples
-              </p>
-              <p className={`text-xs font-medium ${formData.materiasPrimasIds.length > 0 ? 'text-red-600' : 'text-gray-600'}`}>
-                Seleccionados: {formData.materiasPrimasIds.length}
-              </p>
+            
+            <div className="border border-gray-300 rounded-lg bg-white shadow-sm max-h-64 overflow-y-auto">
+              <div className="p-3 border-b border-gray-200 bg-gray-50">
+                <p className="text-sm font-medium text-gray-700">Selecciona los materiales necesarios:</p>
+              </div>
+              
+              <div className="p-3 space-y-3">
+                {materiasPrimas.length > 0 ? (
+                  materiasPrimas.map(mp => (
+                    <div 
+                      key={mp.id} 
+                      className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-md transition-colors"
+                    >
+                      <input
+                        type="checkbox"
+                        id={`material-${mp.id}`}
+                        value={mp.id}
+                        checked={formData.materiasPrimasIds.includes(mp.id.toString())}
+                        onChange={(e) => {
+                          const materialId = e.target.value;
+                          setFormData(prev => ({
+                            ...prev,
+                            materiasPrimasIds: e.target.checked
+                              ? [...prev.materiasPrimasIds, materialId]
+                              : prev.materiasPrimasIds.filter(id => id !== materialId)
+                          }));
+                        }}
+                        className="w-4 h-4 text-red-600 border-gray-300 rounded focus:ring-red-500 focus:ring-2 mt-1"
+                      />
+                      <label 
+                        htmlFor={`material-${mp.id}`} 
+                        className="flex-1 cursor-pointer"
+                      >
+                        <div className="flex flex-col">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-gray-900">{mp.nombre}</span>
+                            <span className="text-sm font-semibold text-green-600">
+                              ${mp.precioUnitario?.toFixed(2) || '0.00'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-4 mt-1">
+                            <span className="text-sm text-gray-600">
+                              Stock: {mp.cantidad} {mp.unidadMedida}
+                            </span>
+                            {mp.cantidad <= 10 && (
+                              <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                                Stock bajo
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <FiPackage className="mx-auto mb-2 text-3xl" />
+                    <p>No hay materiales disponibles</p>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/dashboard/registrar')}
+                      className="mt-2 text-red-600 hover:text-red-700 text-sm font-medium"
+                    >
+                      Registrar material
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
+            
+            <div className="flex justify-between mt-2">
+              <p className="text-xs text-gray-500">
+                Selecciona todos los materiales que necesitas para esta orden
+              </p>
+              <div className="flex items-center gap-4">
+                <p className={`text-xs font-medium ${formData.materiasPrimasIds.length > 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                  Seleccionados: {formData.materiasPrimasIds.length}
+                </p>
+                {formData.materiasPrimasIds.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, materiasPrimasIds: [] }))}
+                    className="text-xs text-gray-500 hover:text-red-600 font-medium"
+                  >
+                    Limpiar selección
+                  </button>
+                )}
+              </div>
+            </div>
+            
+            {/* Validación visual */}
+            {formData.materiasPrimasIds.length === 0 && (
+              <p className="text-red-500 text-sm mt-1">
+                Debes seleccionar al menos un material
+              </p>
+            )}
           </div>
           
           {/* Botones de acción con gradiente */}
