@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import materiaprimaService from '../services/materiaprimaService'
+import materiaprimaService from '../services/materiaPrimaService'
 
 const RegistrarMateriaPrima = () => {
   const [formData, setFormData] = useState({
