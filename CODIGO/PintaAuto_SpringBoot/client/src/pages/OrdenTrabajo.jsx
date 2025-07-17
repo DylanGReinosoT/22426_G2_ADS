@@ -167,7 +167,7 @@ const OrdenesTrabajo = () => {
             </div>
             
             <div>
-              <h4 className="font-medium text-gray-700 mb-2">Materias Primas Utilizadas</h4>
+              <h4 className="font-medium text-gray-700 mb-2">Materias Primas a usar</h4>
               <div className="border rounded-lg overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">

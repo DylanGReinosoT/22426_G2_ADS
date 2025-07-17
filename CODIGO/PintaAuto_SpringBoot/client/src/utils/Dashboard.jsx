@@ -1,10 +1,11 @@
 import { Outlet, Link } from 'react-router-dom'
-import { FiHome, FiPackage, FiPlusCircle, FiTruck, FiChevronDown, FiChevronUp, FiClipboard } from 'react-icons/fi'
+import { FiHome, FiPackage, FiPlusCircle, FiTruck, FiChevronDown, FiChevronUp, FiClipboard, FiList, FiUsers } from 'react-icons/fi'
 import { useState } from 'react'
 
 const Dashboard = () => {
   const [showMaterialSubmenu, setShowMaterialSubmenu] = useState(false)
   const [showWorkOrderSubmenu, setShowWorkOrderSubmenu] = useState(false)
+  const [showClienteSubmenu, setShowClienteSubmenu] = useState(false)
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -37,7 +38,7 @@ const Dashboard = () => {
                   <FiPackage size={20} />
                   <span>Materia Prima</span>
                 </div>
-                {showMaterialSubmenu ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
+                {showMaterialSubmenu ? <FiChevronDown size={18} /> : <FiChevronUp size={18} />}
               </div>
               
               {showMaterialSubmenu && (
@@ -47,6 +48,7 @@ const Dashboard = () => {
                       to="/dashboard"
                       className="flex items-center gap-3 p-2 rounded-md text-white hover:bg-red-700 hover:text-white transition-all text-sm"
                     >
+                      <FiList size={16} />
                       <span>Listado</span>
                     </Link>
                   </li>
@@ -73,7 +75,7 @@ const Dashboard = () => {
                   <FiClipboard size={20} />
                   <span>Órdenes de Trabajo</span>
                 </div>
-                {showWorkOrderSubmenu ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
+                {showWorkOrderSubmenu ? <FiChevronDown size={18} /> : <FiChevronUp size={18} />}
               </div>
               
               {showWorkOrderSubmenu && (
@@ -83,6 +85,7 @@ const Dashboard = () => {
                       to="/dashboard/orden"
                       className="flex items-center gap-3 p-2 rounded-md text-white hover:bg-red-700 hover:text-white transition-all text-sm"
                     >
+                      <FiList size={16} />
                       <span>Listado</span>
                     </Link>
                   </li>
@@ -98,6 +101,44 @@ const Dashboard = () => {
                 </ul>
               )}
             </li>
+
+            {/* Modulo Clientes */}
+            <li>
+              <div 
+                className="flex items-center justify-between p-3 rounded-md text-white hover:bg-red-700 hover:text-white transition-all cursor-pointer"
+                onClick={() => setShowClienteSubmenu(!showClienteSubmenu)}
+              >
+                <div className="flex items-center gap-3">
+                  <FiUsers size={20} />
+                  <span>Clientes</span>
+                </div>
+                {showClienteSubmenu ? <FiChevronDown size={18} /> : <FiChevronUp size={18} />}
+              </div>
+              
+              {showClienteSubmenu && (
+                <ul className="ml-8 mt-2 space-y-2">
+                  <li>
+                    <Link
+                      to="/dashboard/cliente"
+                      className="flex items-center gap-3 p-2 rounded-md text-white hover:bg-red-700 hover:text-white transition-all text-sm"
+                    >
+                      <FiList size={16} />
+                      <span>Listado</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/dashboard/cliente"
+                      className="flex items-center gap-3 p-2 rounded-md text-white hover:bg-red-700 hover:text-white transition-all text-sm"
+                    >
+                      <FiPlusCircle size={16} />
+                      <span>Registro</span>
+                    </Link>
+                  </li>
+                </ul>
+              )}
+            </li>
+            
           </ul>
         </nav>
       </aside>
