@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ordenTrabajoService from '../services/OrdenTrabajoService'
 import materiaPrimaService from '../services/materiaPrimaService'
+import clienteService from '../services/ClienteService'
+// import usuarioService from '../services/UsuarioService'
 import { FiSave, FiArrowLeft, FiTruck, FiUser, FiTool, FiPackage } from 'react-icons/fi'
 
 const OrdenTrabajoForm = () => {
@@ -10,6 +12,8 @@ const OrdenTrabajoForm = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  
+  const [currentUser, setCurrentUser] = useState(null)
   
   const [formData, setFormData] = useState({
     titulo: '',
@@ -23,6 +27,29 @@ const OrdenTrabajoForm = () => {
   const [materiasPrimas, setMateriasPrimas] = useState([])
   const [clientes, setClientes] = useState([])
   const [usuarios, setUsuarios] = useState([])
+
+  useEffect(() => {
+    // Obtener usuario logueado desde localStorage
+    const obtenerUsuarioLogueado = () => {
+      try {
+        const userData = localStorage.getItem('user') || localStorage.getItem('userData')
+        if (userData) {
+          const user = JSON.parse(userData)
+          setCurrentUser(user)
+          // Establecer automáticamente el usuarioId en el formulario
+          setFormData(prev => ({ ...prev, usuarioId: user.id }))
+        } else {
+          // Si no hay usuario logueado, redirigir al login
+          navigate('/login')
+        }
+      } catch (error) {
+        console.error('Error obteniendo usuario logueado:', error)
+        navigate('/login')
+      }
+    }
+
+    obtenerUsuarioLogueado()
+  }, [navigate])
   
   useEffect(() => {
     const cargarDatos = async () => {
@@ -30,12 +57,12 @@ const OrdenTrabajoForm = () => {
         const [mpsRes, clientesRes, usuariosRes] = await Promise.all([
           materiaPrimaService.obtenerTodas(),
           clienteService.obtenerTodos(),
-          usuarioService.obtenerTodos()
+          // usuarioService.obtenerTodos()
         ])
         
         setMateriasPrimas(mpsRes.datos.materias)
-        setClientes(clientesRes.datos.clientes)
-        setUsuarios(usuariosRes.datos.usuarios)
+        setClientes(clientesRes.datos)
+        // setUsuarios(usuariosRes.datos.usuarios)
         
         if (id) {
           setIsEditMode(true)
@@ -45,7 +72,7 @@ const OrdenTrabajoForm = () => {
             titulo: orden.titulo,
             descripcion: orden.descripcion,
             vehiculo: orden.vehiculo || '',
-            usuarioId: orden.usuario.id,
+            // usuarioId: orden.usuario.id,
             clienteId: orden.cliente.id,
             materiasPrimasIds: orden.materiasPrimas.map(mp => mp.id)
           })
@@ -56,9 +83,11 @@ const OrdenTrabajoForm = () => {
         setLoading(false)
       }
     }
-    
-    cargarDatos()
-  }, [id])
+    // Solo cargar datos si ya tenemos el usuario
+    if (currentUser) {
+      cargarDatos()
+    }
+  }, [id, currentUser])
   
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -226,20 +255,23 @@ const OrdenTrabajoForm = () => {
                 <FiUser className="text-red-600 group-hover:text-red-700 transition-colors" /> 
                 Técnico Responsable *
               </label>
-              <select
-                name="usuarioId"
-                value={formData.usuarioId}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 appearance-none bg-white shadow-sm group-hover:shadow-md"
-                required
-              >
-                <option value="">Seleccionar técnico</option>
-                {usuarios.map(usuario => (
-                  <option key={usuario.id} value={usuario.id}>
-                    {usuario.nombre} {usuario.apellido || ''}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={currentUser ? `${currentUser.nombre} ${currentUser.apellido || ''}` : 'Cargando...'}
+                  readOnly
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 cursor-not-allowed"
+                  placeholder="Usuario logueado"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                    Auto-asignado
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Se asigna automáticamente al usuario logueado
+              </p>
             </div>
           </div>
           
