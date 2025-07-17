@@ -5,11 +5,11 @@ import MateriaPrima from './pages/MateriaPrima'
 import RegistrarMateriaPrima from './pages/RegistrarMateriaPrima'
 import Inicio from './pages/Inicio'
 import Gestiones from './utils/Gestiones'
-import Proximente from './pages/Proximamente'
 import OrdenesTrabajo from './pages/OrdenTrabajo'
 import OrdenTrabajoForm from './pages/RegistrarOrdenTrabajo'
 import Cliente from './pages/Cliente'
 import RegistrarCliente from './pages/RegistrarCliente'
+import Proximamente from './pages/Proximamente'
 
 function App() {
   return (
@@ -25,7 +25,7 @@ function App() {
         <Route path="cliente" element={<Cliente />} />
         <Route path="cliente/registrar" element={<RegistrarCliente />} />
         <Route path="crear" element={<OrdenTrabajoForm/>} />
-      <Route path="reportes" element={<Proximente/>} />
+      <Route path="reportes" element={<Proximamente/>} />
       </Route>
     </Routes>
   )

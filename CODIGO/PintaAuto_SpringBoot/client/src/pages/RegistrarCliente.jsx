@@ -107,215 +107,238 @@ const RegistrarCliente = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <FiUser className="text-blue-600" />
-            Registrar Cliente
-          </h2>
-         
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Encabezado con gradiente */}
+        <div className="bg-gradient-to-r from-black to-red-900 rounded-t-xl shadow-lg p-6 text-white">
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold flex items-center gap-3">
+              <FiUser className="text-red-400" />
+              Registrar Nuevo Cliente
+            </h2>
+            <button 
+              onClick={() => navigate('/dashboard/cliente')}
+              className="p-2 rounded-full hover:bg-red-800 transition-colors"
+            >
+              <FiX size={20} />
+            </button>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Nombre y Apellido */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Nombre *
+        {/* Formulario */}
+        <div className="bg-white rounded-b-xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Nombre y Apellido */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="group">
+                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
+                  <FiUser className="text-red-600 group-hover:text-red-700 transition-colors" />
+                  Nombre *
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={cliente.nombre}
+                    onChange={handleChange}
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
+                      errors.nombre ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    placeholder="Ingrese el nombre"
+                  />
+                </div>
+                {errors.nombre && (
+                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                    <FiX size={14} /> {errors.nombre}
+                  </p>
+                )}
+              </div>
+
+              <div className="group">
+                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
+                  <FiUserCheck className="text-red-600 group-hover:text-red-700 transition-colors" />
+                  Apellido *
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="apellido"
+                    value={cliente.apellido}
+                    onChange={handleChange}
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
+                      errors.apellido ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    placeholder="Ingrese el apellido"
+                  />
+                </div>
+                {errors.apellido && (
+                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                    <FiX size={14} /> {errors.apellido}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Cédula y Fecha de Nacimiento */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="group">
+                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
+                  <FiCreditCard className="text-red-600 group-hover:text-red-700 transition-colors" />
+                  Cédula *
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="cedula"
+                    value={cliente.cedula}
+                    onChange={handleChange}
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
+                      errors.cedula ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    placeholder="Ingrese la cédula (10 dígitos)"
+                    maxLength={10}
+                  />
+                </div>
+                {errors.cedula && (
+                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                    <FiX size={14} /> {errors.cedula}
+                  </p>
+                )}
+              </div>
+
+              <div className="group">
+                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
+                  <FiCalendar className="text-red-600 group-hover:text-red-700 transition-colors" />
+                  Fecha de Nacimiento *
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="fechaNacimiento"
+                    value={cliente.fechaNacimiento}
+                    onChange={handleChange}
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
+                      errors.fechaNacimiento ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  />
+                </div>
+                {errors.fechaNacimiento && (
+                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                    <FiX size={14} /> {errors.fechaNacimiento}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Teléfono y Email */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="group">
+                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
+                  <FiPhone className="text-red-600 group-hover:text-red-700 transition-colors" />
+                  Teléfono *
+                </label>
+                <div className="relative">
+                  <input
+                    type="tel"
+                    name="telefono"
+                    value={cliente.telefono}
+                    onChange={handleChange}
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
+                      errors.telefono ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    placeholder="Ingrese el teléfono (10 dígitos)"
+                    maxLength={10}
+                  />
+                </div>
+                {errors.telefono && (
+                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                    <FiX size={14} /> {errors.telefono}
+                  </p>
+                )}
+              </div>
+
+              <div className="group">
+                <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
+                  <FiMail className="text-red-600 group-hover:text-red-700 transition-colors" />
+                  Email *
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    name="email"
+                    value={cliente.email}
+                    onChange={handleChange}
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
+                      errors.email ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                    placeholder="Ingrese el email"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                    <FiX size={14} /> {errors.email}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Dirección */}
+            <div className="group">
+              <label className="block text-gray-800 font-medium mb-2 flex items-center gap-2">
+                <FiMapPin className="text-red-600 group-hover:text-red-700 transition-colors" />
+                Dirección *
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUser className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="text"
-                  name="nombre"
-                  value={cliente.nombre}
+                <textarea
+                  name="direccion"
+                  value={cliente.direccion}
                   onChange={handleChange}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.nombre ? 'border-red-500' : 'border-gray-300'
+                  rows={3}
+                  className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all ${
+                    errors.direccion ? 'border-red-500' : 'border-gray-300 hover:border-gray-400'
                   }`}
-                  placeholder="Ingrese el nombre"
+                  placeholder="Ingrese la dirección completa"
                 />
               </div>
-              {errors.nombre && (
-                <p className="text-red-500 text-sm mt-1">{errors.nombre}</p>
+              {errors.direccion && (
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <FiX size={14} /> {errors.direccion}
+                </p>
               )}
             </div>
 
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Apellido *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiUserCheck className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="text"
-                  name="apellido"
-                  value={cliente.apellido}
-                  onChange={handleChange}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.apellido ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Ingrese el apellido"
-                />
-              </div>
-              {errors.apellido && (
-                <p className="text-red-500 text-sm mt-1">{errors.apellido}</p>
-              )}
+            {/* Botones */}
+            <div className="flex justify-end space-x-4 pt-6">
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard/cliente')}
+                className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 hover:border-gray-400 transition-all font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg hover:from-red-700 hover:to-red-900 transition-all shadow-md hover:shadow-lg font-medium disabled:opacity-70"
+              >
+                {loading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Guardando...
+                  </>
+                ) : (
+                  <>
+                    <FiSave size={18} />
+                    Guardar Cliente
+                  </>
+                )}
+              </button>
             </div>
-          </div>
-
-          {/* Cédula y Fecha de Nacimiento */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Cédula *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiCreditCard className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="text"
-                  name="cedula"
-                  value={cliente.cedula}
-                  onChange={handleChange}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.cedula ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Ingrese la cédula (10 dígitos)"
-                  maxLength={10}
-                />
-              </div>
-              {errors.cedula && (
-                <p className="text-red-500 text-sm mt-1">{errors.cedula}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Fecha de Nacimiento *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiCalendar className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="date"
-                  name="fechaNacimiento"
-                  value={cliente.fechaNacimiento}
-                  onChange={handleChange}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.fechaNacimiento ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                />
-              </div>
-              {errors.fechaNacimiento && (
-                <p className="text-red-500 text-sm mt-1">{errors.fechaNacimiento}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Teléfono y Email */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Teléfono *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiPhone className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="tel"
-                  name="telefono"
-                  value={cliente.telefono}
-                  onChange={handleChange}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.telefono ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Ingrese el teléfono (10 dígitos)"
-                  maxLength={10}
-                />
-              </div>
-              {errors.telefono && (
-                <p className="text-red-500 text-sm mt-1">{errors.telefono}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Email *
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FiMail className="text-gray-400" size={18} />
-                </div>
-                <input
-                  type="email"
-                  name="email"
-                  value={cliente.email}
-                  onChange={handleChange}
-                  className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Ingrese el email"
-                />
-              </div>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Dirección */}
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Dirección *
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiMapPin className="text-gray-400" size={18} />
-              </div>
-              <textarea
-                name="direccion"
-                value={cliente.direccion}
-                onChange={handleChange}
-                rows={3}
-                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                  errors.direccion ? 'border-red-500' : 'border-gray-300'
-                }`}
-                placeholder="Ingrese la dirección completa"
-              />
-            </div>
-            {errors.direccion && (
-              <p className="text-red-500 text-sm mt-1">{errors.direccion}</p>
-            )}
-          </div>
-
-          {/* Botones */}
-          <div className="flex justify-end space-x-4 pt-6">
-            <button
-              type="button"
-              onClick={() => navigate('/dashboard/cliente')}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-            >
-              <FiSave size={18} />
-              {loading ? 'Guardando...' : 'Guardar Cliente'}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   )

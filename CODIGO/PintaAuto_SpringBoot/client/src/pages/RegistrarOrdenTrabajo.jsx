@@ -107,7 +107,7 @@ const OrdenTrabajoForm = () => {
       <div className="bg-gradient-to-r from-black to-red-900 rounded-xl shadow-xl mb-8 overflow-hidden">
         <div className="flex justify-between items-center p-6">
           <button
-            onClick={() => navigate('/ordenes-trabajo')}
+            onClick={() => navigate('/dashboard/orden')}
             className="flex items-center gap-2 text-gray-200 hover:text-white transition-colors"
           >
             <FiArrowLeft className="text-red-400" /> 
@@ -277,7 +277,7 @@ const OrdenTrabajoForm = () => {
           <div className="flex justify-end pt-6 border-t border-gray-200">
             <button
               type="button"
-              onClick={() => navigate('/ordenes-trabajo')}
+              onClick={() => navigate('/dashboard/orden')}
               className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-gray-200 to-gray-300 text-gray-800 font-medium rounded-lg mr-4 hover:from-gray-300 hover:to-gray-400 transition-all shadow-sm hover:shadow-md"
             >
               Cancelar

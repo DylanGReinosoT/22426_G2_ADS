@@ -128,7 +128,7 @@ const Dashboard = () => {
                   </li>
                   <li>
                     <Link
-                      to="/dashboard/cliente"
+                      to="/dashboard/cliente/registrar"
                       className="flex items-center gap-3 p-2 rounded-md text-white hover:bg-red-700 hover:text-white transition-all text-sm"
                     >
                       <FiPlusCircle size={16} />
