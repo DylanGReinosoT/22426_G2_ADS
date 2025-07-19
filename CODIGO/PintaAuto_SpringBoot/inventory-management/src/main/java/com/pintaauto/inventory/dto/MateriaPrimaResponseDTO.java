@@ -10,7 +10,7 @@ public class MateriaPrimaResponseDTO {
     private Long id;
     private String nombre;
     private String unidadMedida;
-    private Integer cantidad;
+    private Double cantidad;
     private String detalles;
     private BigDecimal precioUnitario;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
@@ -25,7 +25,7 @@ public class MateriaPrimaResponseDTO {
     // Constructores
     public MateriaPrimaResponseDTO() {}
 
-    public MateriaPrimaResponseDTO(Long id, String nombre, String unidadMedida, Integer cantidad,
+    public MateriaPrimaResponseDTO(Long id, String nombre, String unidadMedida, Double cantidad,
                                    String detalles, BigDecimal precioUnitario, LocalDateTime fechaIngreso,
                                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -51,8 +51,8 @@ public class MateriaPrimaResponseDTO {
     public String getUnidadMedida() { return unidadMedida; }
     public void setUnidadMedida(String unidadMedida) { this.unidadMedida = unidadMedida; }
 
-    public Integer getCantidad() { return cantidad; }
-    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
+    public Double getCantidad() { return cantidad; }
+    public void setCantidad(Double cantidad) { this.cantidad = cantidad; }
 
     public String getDetalles() { return detalles; }
     public void setDetalles(String detalles) { this.detalles = detalles; }

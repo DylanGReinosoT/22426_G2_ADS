@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.Map;
 
 public class OrdenTrabajoRequestDTO {
 
@@ -26,19 +27,22 @@ public class OrdenTrabajoRequestDTO {
     @NotNull(message = "El cliente es obligatorio")
     private Long clienteId;
 
-    @NotNull(message = "Debe especificar al menos una materia prima")
-    private List<Long> materiasPrimasIds;
+    @NotNull(message = "Debe especificar al menos una materia prima con su cantidad")
+    private Map<Long,Double> materiasPrimasYcantidades;
 
     // Constructores
-
-
-    public OrdenTrabajoRequestDTO(String titulo, String descripcion, String vehiculo, Long usuarioId, Long clienteId, List<Long> materiasPrimasIds) {
+    public OrdenTrabajoRequestDTO(String titulo,
+                                  String descripcion,
+                                  String vehiculo,
+                                  Long usuarioId,
+                                  Long clienteId,
+                                  Map<Long, Double> materiasPrimasYcantidades) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.vehiculo = vehiculo;
         this.usuarioId = usuarioId;
         this.clienteId = clienteId;
-        this.materiasPrimasIds = materiasPrimasIds;
+        this.materiasPrimasYcantidades = materiasPrimasYcantidades;
     }
 
     // Getters y setters
@@ -62,6 +66,7 @@ public class OrdenTrabajoRequestDTO {
     public Long getClienteId() { return clienteId; }
     public void setClienteId(Long clienteId) { this.clienteId = clienteId; }
 
-    public List<Long> getMateriasPrimasIds() { return materiasPrimasIds; }
-    public void setMateriasPrimasIds(List<Long> materiasPrimasIds) { this.materiasPrimasIds = materiasPrimasIds; }
+    public Map<Long, Double> getMateriasPrimasYcantidades() {
+        return materiasPrimasYcantidades;
+    }
 }

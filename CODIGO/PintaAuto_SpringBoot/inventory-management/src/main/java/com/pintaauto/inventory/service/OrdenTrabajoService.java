@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,12 +53,31 @@ public class OrdenTrabajoService{
                 .orElseThrow(() -> new RuntimeException("Orden de trabajo no encontrada con ID: " + id));
     }
 
+    @Transactional
     // Crear nueva orden de trabajo
     public OrdenTrabajoResponseDTO crear(OrdenTrabajoRequestDTO requestDTO) {
         Usuario user = new Usuario();
+        Map<Long, Double> materiasUsadas = requestDTO.getMateriasPrimasYcantidades();
         user = ordenTrabajoRepository.findUsuarioById(requestDTO.getUsuarioId());
         if (user == null) {
             throw new RuntimeException("Usuario no encontrado con ID: " + requestDTO.getUsuarioId());
+        }
+        for (Map.Entry<Long, Double> entrada : materiasUsadas.entrySet()){
+            Long materiaPrimaId = entrada.getKey();
+            Double cantidadUsada = entrada.getValue();
+
+            // Verificar si la materia prima existe
+            MateriaPrima materiaPrima = materiaPrimaRepository.findById(materiaPrimaId)
+                    .orElseThrow(() -> new RuntimeException("Materia prima no encontrada con ID: " + materiaPrimaId));
+
+            // Verificar si hay suficiente cantidad disponible
+            if (materiaPrima.getCantidad() < cantidadUsada) {
+                throw new RuntimeException("No hay suficiente cantidad de la materia prima '" + materiaPrima.getNombre() + "'");
+            }
+
+            // Actualizar la cantidad de la materia prima
+            materiaPrima.setCantidad(materiaPrima.getCantidad() - cantidadUsada);
+            materiaPrimaRepository.save(materiaPrima);
         }
 
         OrdenTrabajo ordenTrabajo = convertirAEntidad(requestDTO);
@@ -119,9 +139,10 @@ public class OrdenTrabajoService{
         ClienteResponseDTO clienteDTO = clienteService.convertirAResponseDTO(ordenTrabajo.getCliente());
 
         // Suponiendo que tienes un método para convertir MateriaPrima a MateriaPrimaResponseDTO
-        List<MateriaPrimaResponseDTO> materiasPrimasDTO = ordenTrabajo.getMateriasPrimas().stream()
-            .map(this::convertirMateriaPrimaAResponseDTO)
-            .collect(Collectors.toList());
+//        List<MateriaPrimaResponseDTO> materiasPrimasDTO = ordenTrabajo.getMateriasPrimas().stream()
+//            .map(this::convertirMateriaPrimaAResponseDTO)
+//            .collect(Collectors.toList());
+        Map<Long, Double> materiasPrimasYcantidades = ordenTrabajo.getMateriasPrimasYcantidades();
 
         return new OrdenTrabajoResponseDTO(
             ordenTrabajo.getId(),
@@ -134,7 +155,7 @@ public class OrdenTrabajoService{
             ordenTrabajo.getHoraFinalizacion(),
             usuarioDTO,
             clienteDTO,
-            materiasPrimasDTO
+            materiasPrimasYcantidades
         );
     }
 
@@ -161,14 +182,14 @@ public class OrdenTrabajoService{
         user = ordenTrabajoRepository.findUsuarioById(requestDTO.getUsuarioId());
         // Recuperar todas las materias primas por sus IDs
         cliente = ordenTrabajoRepository.findClienteById(requestDTO.getClienteId());
-        List<MateriaPrima> materiasPrimas = materiaPrimaRepository.findAllById(requestDTO.getMateriasPrimasIds());
+        Map<Long, Double> materiasPrimasYcantidades = requestDTO.getMateriasPrimasYcantidades();
         return new OrdenTrabajo(
             requestDTO.getTitulo(),
             requestDTO.getDescripcion(),
             requestDTO.getVehiculo(),
             user,
             cliente,
-            materiasPrimas
+            materiasPrimasYcantidades
         );
     }
 }

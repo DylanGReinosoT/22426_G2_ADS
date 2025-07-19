@@ -68,7 +68,7 @@ const OrdenesTrabajo = () => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => navigate('/ordenes-trabajo/nueva')}
+          onClick={() => navigate('/dashboard/crear')}
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-700 to-red-900 text-white rounded-lg shadow-lg hover:shadow-red-500/30 transition-all"
         >
           <FiPlus className="text-lg" />

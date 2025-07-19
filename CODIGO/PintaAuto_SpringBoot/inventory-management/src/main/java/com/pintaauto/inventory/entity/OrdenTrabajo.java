@@ -8,7 +8,9 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Table(name= "orden_trabajo")
@@ -58,13 +60,15 @@ public class OrdenTrabajo {
     private Cliente cliente;
 
     // Relación muchos a muchos con MateriaPrima (materia prima utilizada)
-    @ManyToMany
-    @JoinTable(
-        name = "orden_trabajo_materia_prima",
-        joinColumns = @JoinColumn(name = "orden_trabajo_id"),
-        inverseJoinColumns = @JoinColumn(name = "materia_prima_id")
+    @ElementCollection
+    @CollectionTable(
+            name = "orden_trabajo_materia_cantidades",
+            joinColumns = @JoinColumn(name = "orden_trabajo_id")
     )
-    private List<MateriaPrima> materiasPrimas;
+    @MapKeyColumn(name = "materia_prima_id")
+    @Column(name = "cantidad_usada")
+    private Map<Long, Double> materiasPrimasYcantidades = new HashMap<>();
+
 
     // Constructores
 
@@ -75,13 +79,13 @@ public class OrdenTrabajo {
                         String vehiculo,
                         Usuario usuario,
                         Cliente cliente,
-                        List<MateriaPrima> materiasPrimas) {
+                        Map<Long, Double> materiasPrimasYcantidades) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.vehiculo = vehiculo;
         this.usuario = usuario;
         this.cliente = cliente;
-        this.materiasPrimas = materiasPrimas;
+        this.materiasPrimasYcantidades = materiasPrimasYcantidades;
     }
 
     // Getters y Setters
@@ -163,11 +167,11 @@ public class OrdenTrabajo {
         return cliente;
     }
 
-    public List<MateriaPrima> getMateriasPrimas() {
-        return materiasPrimas;
+    public Map<Long, Double> getMateriasPrimasYcantidades() {
+        return materiasPrimasYcantidades;
     }
 
-    public void setMateriasPrimas(List<MateriaPrima> materiasPrimas) {
-        this.materiasPrimas = materiasPrimas;
+    public void setMateriasPrimasYcantidades(Map<Long, Double> materiasPrimasYcantidades) {
+        this.materiasPrimasYcantidades = materiasPrimasYcantidades;
     }
 }

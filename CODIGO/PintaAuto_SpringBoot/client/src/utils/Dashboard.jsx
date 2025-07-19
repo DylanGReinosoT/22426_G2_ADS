@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
-import { FiHome, FiPackage, FiPlusCircle, FiTruck, FiChevronDown, FiChevronUp, FiClipboard, FiList, FiUsers, FiLogOut } from 'react-icons/fi'
+import { FiHome, FiPackage, FiPlusCircle, FiTruck, FiChevronRight, FiChevronDown, FiChevronUp, FiClipboard, FiList, FiUsers, FiLogOut } from 'react-icons/fi'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -32,6 +32,7 @@ const Dashboard = () => {
             className="text-red-600"
           >
             <FiTruck size={24} />
+            {/* <FiChevronUp size={24} /> */}
           </motion.div>
           <motion.h1 
             initial={{ opacity: 1 }}
