@@ -21,7 +21,7 @@ const OrdenTrabajoForm = () => {
     vehiculo: '',
     usuarioId: '',
     clienteId: '',
-    materiasPrimasIds: []
+    materiasPrimasYCantidades: {}
   })
   
   const [materiasPrimas, setMateriasPrimas] = useState([])
@@ -62,12 +62,16 @@ const OrdenTrabajoForm = () => {
           setIsEditMode(true)
           const ordenRes = await ordenTrabajoService.obtenerPorId(id)
           const orden = ordenRes.datos.orden
+
+          const materiasSeleccionadas = orden.materiasPrimasYcantidades 
+          ? Object.keys(orden.materiasPrimasYcantidades).map(id => id.toString())
+          : []
           setFormData({
             titulo: orden.titulo,
             descripcion: orden.descripcion,
             vehiculo: orden.vehiculo || '',
             clienteId: orden.cliente.id,
-            materiasPrimasIds: orden.materiasPrimas.map(mp => mp.id)
+            materiasPrimasYCantidades: materiasSeleccionadas
           })
         }
       } catch (error) {
@@ -87,20 +91,57 @@ const OrdenTrabajoForm = () => {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
   
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    // Validar que al menos un material esté seleccionado
+    if (Object.keys(formData.materiasPrimasYCantidades).length === 0) {
+      alert('Debes seleccionar al menos un material')
+      return
+    }
+    
+    // Validar que todas las cantidades sean válidas
+    const invalidMaterials = Object.entries(formData.materiasPrimasYCantidades).filter(([id, cantidad]) => {
+      const material = materiasPrimas.find(mp => mp.id.toString() === id)
+      return !material || cantidad <= 0 || cantidad > material.cantidad
+    })
+    
+    if (invalidMaterials.length > 0) {
+      alert('Hay materiales con cantidades inválidas. Por favor revisa las cantidades.')
+      return
+    }
+    
     setSubmitting(true)
     
     try {
-      if (isEditMode) {
-        await ordenTrabajoService.actualizar(id, formData)
-      } else {
-        await ordenTrabajoService.crear(formData)
+      // Convertir las claves a números para el backend
+      const materiasPrimasYcantidades = {}
+      Object.entries(formData.materiasPrimasYCantidades).forEach(([id, cantidad]) => {
+        materiasPrimasYcantidades[parseInt(id)] = parseFloat(cantidad)
+      })
+      
+      const dataToSend = {
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        vehiculo: formData.vehiculo,
+        usuarioId: formData.usuarioId,
+        clienteId: parseInt(formData.clienteId),
+        materiasPrimasYcantidades: materiasPrimasYcantidades
       }
+      
+      console.log('Datos a enviar:', dataToSend) // Para debug
+      
+      if (isEditMode) {
+        await ordenTrabajoService.actualizar(id, dataToSend)
+      } else {
+        await ordenTrabajoService.crear(dataToSend)
+      }
+      
       setSuccess(true)
       setTimeout(() => navigate('/dashboard/orden'), 1500)
     } catch (error) {
       console.error('Error guardando orden:', error)
+      alert('Ocurrió un error al guardar la orden: ' + (error.response?.data?.message || error.message))
     } finally {
       setSubmitting(false)
     }
@@ -270,16 +311,16 @@ const OrdenTrabajoForm = () => {
             </div>
           </div>
           
-          {/* Campo Materiales */}
+                    {/* Campo Materiales */}
           <div className="relative group">
             <label className="block text-gray-300 font-medium mb-1 flex items-center gap-2">
               <FiPackage className="text-red-400 group-hover:text-red-300 transition-colors" /> 
               Materiales a utilizar *
             </label>
             
-            <div className="border border-gray-600 rounded-lg bg-gray-700 shadow-sm max-h-64 overflow-y-auto">
+            <div className="border border-gray-600 rounded-lg bg-gray-700 shadow-sm max-h-80 overflow-y-auto">
               <div className="p-3 border-b border-gray-600 bg-gray-800">
-                <p className="text-sm font-medium text-gray-300">Selecciona los materiales necesarios:</p>
+                <p className="text-sm font-medium text-gray-300">Selecciona los materiales y cantidades necesarias:</p>
               </div>
               
               <div className="p-3 space-y-3">
@@ -287,41 +328,38 @@ const OrdenTrabajoForm = () => {
                   materiasPrimas.map(mp => (
                     <div 
                       key={mp.id} 
-                      className="flex items-start gap-3 p-2 hover:bg-gray-600/50 rounded-md transition-colors"
+                      className="flex items-start gap-3 p-3 hover:bg-gray-600/50 rounded-md transition-colors border border-gray-600/50"
                     >
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          id={`material-${mp.id}`}
-                          value={mp.id}
-                          checked={formData.materiasPrimasIds.includes(mp.id.toString())}
-                          onChange={(e) => {
-                            const materialId = e.target.value;
-                            setFormData(prev => ({
-                              ...prev,
-                              materiasPrimasIds: e.target.checked
-                                ? [...prev.materiasPrimasIds, materialId]
-                                : prev.materiasPrimasIds.filter(id => id !== materialId)
-                            }));
-                          }}
-                          className="w-4 h-4 text-red-600 border-gray-500 rounded focus:ring-red-500 focus:ring-2 mt-1 bg-gray-600"
-                        />
-                        {formData.materiasPrimasIds.includes(mp.id.toString()) && (
-                          <div className="absolute inset-0 bg-red-500/10 rounded pointer-events-none"></div>
-                        )}
-                      </div>
-                      <label 
-                        htmlFor={`material-${mp.id}`} 
-                        className="flex-1 cursor-pointer"
-                      >
-                        <div className="flex flex-col">
-                          <div className="flex items-center justify-between">
+                      <input
+                        type="checkbox"
+                        id={`material-${mp.id}`}
+                        checked={formData.materiasPrimasYCantidades.hasOwnProperty(mp.id)}
+                        onChange={(e) => {
+                          setFormData(prev => {
+                            const newMaterias = { ...prev.materiasPrimasYCantidades }
+                            if (e.target.checked) {
+                              newMaterias[mp.id] = 1.0 // Cantidad por defecto
+                            } else {
+                              delete newMaterias[mp.id]
+                            }
+                            return { ...prev, materiasPrimasYCantidades: newMaterias }
+                          })
+                        }}
+                        className="w-4 h-4 text-red-600 border-gray-500 rounded focus:ring-red-500 focus:ring-2 mt-2 bg-gray-600"
+                      />
+                      
+                      <div className="flex-1">
+                        <label 
+                          htmlFor={`material-${mp.id}`} 
+                          className="cursor-pointer block"
+                        >
+                          <div className="flex items-center justify-between mb-2">
                             <span className="font-medium text-gray-100">{mp.nombre}</span>
                             <span className="text-sm font-semibold text-green-400">
                               ${mp.precioUnitario?.toFixed(2) || '0.00'}
                             </span>
                           </div>
-                          <div className="flex items-center gap-4 mt-1">
+                          <div className="flex items-center gap-4">
                             <span className="text-sm text-gray-400">
                               Stock: {mp.cantidad} {mp.unidadMedida}
                             </span>
@@ -331,8 +369,49 @@ const OrdenTrabajoForm = () => {
                               </span>
                             )}
                           </div>
-                        </div>
-                      </label>
+                        </label>
+                        
+                        {/* Input de cantidad cuando está seleccionado */}
+                        {formData.materiasPrimasYCantidades.hasOwnProperty(mp.id) && (
+                          <div className="mt-3 flex items-center gap-3">
+                            <label className="text-sm text-gray-300 font-medium min-w-[70px]">
+                              Cantidad:
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="number"
+                                min="1"
+                                max={mp.cantidad}
+                                step="1"
+                                value={formData.materiasPrimasYCantidades[mp.id] || 1.0}
+                                onChange={(e) => {
+                                  const value = parseFloat(e.target.value) || 0
+                                  if (value <= mp.cantidad) {
+                                    setFormData(prev => ({
+                                      ...prev,
+                                      materiasPrimasYCantidades: {
+                                        ...prev.materiasPrimasYCantidades,
+                                        [mp.id]: value
+                                      }
+                                    }))
+                                  }
+                                }}
+                                className="w-24 px-3 py-1 bg-gray-600 border border-gray-500 rounded text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                              />
+                              <span className="text-sm text-gray-400">
+                                {mp.unidadMedida}
+                              </span>
+                            </div>
+                            
+                            {/* Validación de cantidad */}
+                            {formData.materiasPrimasYCantidades[mp.id] > mp.cantidad && (
+                              <span className="text-xs text-red-400">
+                                Cantidad excede el stock disponible
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -351,18 +430,18 @@ const OrdenTrabajoForm = () => {
               </div>
             </div>
             
-            <div className="flex justify-between mt-2">
+            <div className="flex justify-between mt-3">
               <p className="text-xs text-gray-400">
-                Selecciona todos los materiales que necesitas para esta orden
+                Selecciona los materiales y especifica las cantidades necesarias
               </p>
               <div className="flex items-center gap-4">
-                <p className={`text-xs font-medium ${formData.materiasPrimasIds.length > 0 ? 'text-red-400' : 'text-gray-400'}`}>
-                  Seleccionados: {formData.materiasPrimasIds.length}
+                <p className={`text-xs font-medium ${Object.keys(formData.materiasPrimasYCantidades).length > 0 ? 'text-red-400' : 'text-gray-400'}`}>
+                  Seleccionados: {Object.keys(formData.materiasPrimasYCantidades).length}
                 </p>
-                {formData.materiasPrimasIds.length > 0 && (
+                {Object.keys(formData.materiasPrimasYCantidades).length > 0 && (
                   <button
                     type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, materiasPrimasIds: [] }))}
+                    onClick={() => setFormData(prev => ({ ...prev, materiasPrimasYCantidades: {} }))}
                     className="text-xs text-gray-400 hover:text-red-400 font-medium flex items-center gap-1"
                   >
                     <FiX size={14} /> Limpiar
@@ -371,8 +450,39 @@ const OrdenTrabajoForm = () => {
               </div>
             </div>
             
+            {/* Resumen de materiales seleccionados */}
+            {Object.keys(formData.materiasPrimasYCantidades).length > 0 && (
+              <div className="mt-3 p-3 bg-gray-800 rounded-lg border border-gray-600">
+                <h4 className="text-sm font-medium text-gray-300 mb-2">Resumen de materiales:</h4>
+                <div className="space-y-1">
+                  {Object.entries(formData.materiasPrimasYCantidades).map(([id, cantidad]) => {
+                    const material = materiasPrimas.find(mp => mp.id.toString() === id)
+                    const total = material ? (cantidad * material.precioUnitario).toFixed(2) : '0.00'
+                    return (
+                      <div key={id} className="flex justify-between text-xs text-gray-400">
+                        <span>{material?.nombre} - {cantidad} {material?.unidadMedida}</span>
+                        <span>${total}</span>
+                      </div>
+                    )
+                  })}
+                  <div className="pt-1 border-t border-gray-600 font-medium text-gray-300">
+                    <div className="flex justify-between">
+                      <span>Total estimado:</span>
+                      <span className="text-green-400">
+                        ${Object.entries(formData.materiasPrimasYCantidades)
+                          .reduce((total, [id, cantidad]) => {
+                            const material = materiasPrimas.find(mp => mp.id.toString() === id)
+                            return total + (material ? cantidad * material.precioUnitario : 0)
+                          }, 0).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {/* Validación visual */}
-            {formData.materiasPrimasIds.length === 0 && (
+            {Object.keys(formData.materiasPrimasYCantidades).length === 0 && (
               <p className="text-red-400 text-sm mt-1 flex items-center gap-1">
                 <FiX /> Debes seleccionar al menos un material
               </p>
@@ -390,7 +500,7 @@ const OrdenTrabajoForm = () => {
             </button>
             <button
               type="submit"
-              disabled={submitting || formData.materiasPrimasIds.length === 0}
+              disabled={submitting || Object.keys(formData.materiasPrimasYCantidades).length === 0}
               className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-600 to-red-800 hover:from-red-700 hover:to-red-900 text-white font-medium rounded-lg shadow-lg transition-all disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-xl relative overflow-hidden group"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-700 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
