@@ -15,6 +15,8 @@ public interface OrdenTrabajoRepository extends JpaRepository<OrdenTrabajo, Long
     // Buscar órdenes por usuario responsable
     List<OrdenTrabajo> findByUsuario(Usuario usuario);
 
+    @Query("SELECT o FROM OrdenTrabajo o JOIN o.materiasPrimasYcantidades mp WHERE KEY(mp) IN :materiaPrimaIds")
+    List<OrdenTrabajo> findByMateriaPrimaIds(List<Long> materiaPrimaIds);
 
     // Buscar por título que contenga un texto (búsqueda parcial)
     List<OrdenTrabajo> findByTituloContainingIgnoreCase(String titulo);

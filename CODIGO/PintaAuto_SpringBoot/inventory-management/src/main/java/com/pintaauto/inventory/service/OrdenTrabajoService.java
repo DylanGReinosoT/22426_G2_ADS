@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ public class OrdenTrabajoService{
                 .map(this::convertirAResponseDTO)
                 .orElseThrow(() -> new RuntimeException("Orden de trabajo no encontrada con ID: " + id));
     }
+
 
     @Transactional
     // Crear nueva orden de trabajo
@@ -132,17 +134,18 @@ public class OrdenTrabajoService{
     }
 
     private OrdenTrabajoResponseDTO convertirAResponseDTO(OrdenTrabajo ordenTrabajo) {
-        // Suponiendo que tienes un método para convertir Usuario a UsuarioResponseDTO
+        //  convertir Usuario a UsuarioResponseDTO
         UsuarioResponseDTO usuarioDTO = usuarioService.convertirAResponseDTO(ordenTrabajo.getUsuario());
 
-        // Suponiendo que tienes un método para convertir Cliente a ClienteResponseDTO
+        // convertir Cliente a ClienteResponseDTO
         ClienteResponseDTO clienteDTO = clienteService.convertirAResponseDTO(ordenTrabajo.getCliente());
 
-        // Suponiendo que tienes un método para convertir MateriaPrima a MateriaPrimaResponseDTO
-//        List<MateriaPrimaResponseDTO> materiasPrimasDTO = ordenTrabajo.getMateriasPrimas().stream()
-//            .map(this::convertirMateriaPrimaAResponseDTO)
-//            .collect(Collectors.toList());
-        Map<Long, Double> materiasPrimasYcantidades = ordenTrabajo.getMateriasPrimasYcantidades();
+        // convertir MateriaPrima a MateriaPrimaResponseDTO
+        Map<Long, Double> materiasPrimasYcantidades = new HashMap<>();
+        for (Map.Entry<MateriaPrima, Double> entry : ordenTrabajo.getMateriasPrimasYcantidades().entrySet()) {
+            materiasPrimasYcantidades.put(entry.getKey().getId(), entry.getValue());
+        }
+        Double valorMateriales = calcularValorMateriales(materiasPrimasYcantidades);
 
         return new OrdenTrabajoResponseDTO(
             ordenTrabajo.getId(),
@@ -155,7 +158,8 @@ public class OrdenTrabajoService{
             ordenTrabajo.getHoraFinalizacion(),
             usuarioDTO,
             clienteDTO,
-            materiasPrimasYcantidades
+            materiasPrimasYcantidades,
+            valorMateriales
         );
     }
 
@@ -175,6 +179,17 @@ public class OrdenTrabajoService{
         );
     }
 
+    public Double calcularValorMateriales(Map<Long, Double> idsYcantidades) {
+        return idsYcantidades.entrySet().stream()
+                .mapToDouble(entry -> {
+                    MateriaPrima materia = materiaPrimaRepository.findById(entry.getKey())
+                            .orElseThrow(() -> new RuntimeException("Materia prima no encontrada con ID: " + entry.getKey()));
+                    return materia.getPrecioUnitario().doubleValue() * entry.getValue();
+                })
+                .sum();
+    }
+
+
     private OrdenTrabajo convertirAEntidad(OrdenTrabajoRequestDTO requestDTO){
         Usuario user = new Usuario();
         // En tu servicio
@@ -182,15 +197,26 @@ public class OrdenTrabajoService{
         user = ordenTrabajoRepository.findUsuarioById(requestDTO.getUsuarioId());
         // Recuperar todas las materias primas por sus IDs
         cliente = ordenTrabajoRepository.findClienteById(requestDTO.getClienteId());
-        Map<Long, Double> materiasPrimasYcantidades = requestDTO.getMateriasPrimasYcantidades();
+//        Map<MateriaPrima, Double> materiasPrimasYcantidades = requestDTO.getMateriasPrimasYcantidades();
+        Map<Long, Double> idsYcantidades = requestDTO.getMateriasPrimasYcantidades(); // tu mapa de entrada
+        Map<MateriaPrima, Double> materiasPrimasYcantidades = new HashMap<>();
+
+        for (Map.Entry<Long, Double> entry : idsYcantidades.entrySet()) {
+            MateriaPrima materia = materiaPrimaRepository.findById(entry.getKey())
+                    .orElseThrow(() -> new RuntimeException("Materia prima no encontrada con ID: " + entry.getKey()));
+            materiasPrimasYcantidades.put(materia, entry.getValue());
+        }
+        Double valorMateriales = calcularValorMateriales(requestDTO.getMateriasPrimasYcantidades());
         return new OrdenTrabajo(
             requestDTO.getTitulo(),
             requestDTO.getDescripcion(),
             requestDTO.getVehiculo(),
             user,
             cliente,
-            materiasPrimasYcantidades
+            materiasPrimasYcantidades,
+            valorMateriales
         );
     }
+
 }
 

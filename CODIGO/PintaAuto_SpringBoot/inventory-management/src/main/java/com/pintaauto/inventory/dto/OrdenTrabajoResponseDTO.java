@@ -1,5 +1,7 @@
 package com.pintaauto.inventory.dto;
 
+import com.pintaauto.inventory.entity.MateriaPrima;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -18,6 +20,7 @@ public class OrdenTrabajoResponseDTO {
     private UsuarioResponseDTO usuario;
     private ClienteResponseDTO cliente;
     private Map<Long, Double> materiasPrimasYcantidades;
+    private Double valorMateriales;
 
     // Constructores
 
@@ -32,7 +35,8 @@ public class OrdenTrabajoResponseDTO {
                                    LocalTime horaFinalizacion,
                                    UsuarioResponseDTO usuario,
                                    ClienteResponseDTO cliente,
-                                   Map<Long, Double> materiasPrimasYcantidades) {
+                                   Map<Long, Double> materiasPrimasYcantidades,
+                                   Double valorMateriales) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -44,6 +48,7 @@ public class OrdenTrabajoResponseDTO {
         this.usuario = usuario;
         this.cliente = cliente;
         this.materiasPrimasYcantidades = materiasPrimasYcantidades;
+        this.valorMateriales = valorMateriales;
     }
 
     // Getters y setters
@@ -79,5 +84,13 @@ public class OrdenTrabajoResponseDTO {
 
     public Map<Long, Double> getMateriasPrimasYcantidades() {
         return materiasPrimasYcantidades;
+    }
+
+    public Double getValorMateriales() {
+        return valorMateriales;
+    }
+
+    public void setValorMateriales(Double valorMateriales) {
+        this.valorMateriales = valorMateriales;
     }
 }

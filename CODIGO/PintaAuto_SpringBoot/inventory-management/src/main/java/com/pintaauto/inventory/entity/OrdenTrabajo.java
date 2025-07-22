@@ -59,7 +59,6 @@ public class OrdenTrabajo {
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    // Relación muchos a muchos con MateriaPrima (materia prima utilizada)
     @ElementCollection
     @CollectionTable(
             name = "orden_trabajo_materia_cantidades",
@@ -67,7 +66,10 @@ public class OrdenTrabajo {
     )
     @MapKeyColumn(name = "materia_prima_id")
     @Column(name = "cantidad_usada")
-    private Map<Long, Double> materiasPrimasYcantidades = new HashMap<>();
+    private Map<MateriaPrima, Double> materiasPrimasYcantidades = new HashMap<>();
+
+    @Column(name= "valor_materiales")
+    private Double valorMateriales;
 
 
     // Constructores
@@ -79,13 +81,15 @@ public class OrdenTrabajo {
                         String vehiculo,
                         Usuario usuario,
                         Cliente cliente,
-                        Map<Long, Double> materiasPrimasYcantidades) {
+                        Map<MateriaPrima, Double> materiasPrimasYcantidades,
+                        Double valorMateriales) {
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.vehiculo = vehiculo;
         this.usuario = usuario;
         this.cliente = cliente;
         this.materiasPrimasYcantidades = materiasPrimasYcantidades;
+        this.valorMateriales = valorMateriales;
     }
 
     // Getters y Setters
@@ -167,11 +171,11 @@ public class OrdenTrabajo {
         return cliente;
     }
 
-    public Map<Long, Double> getMateriasPrimasYcantidades() {
+    public Map<MateriaPrima, Double> getMateriasPrimasYcantidades() {
         return materiasPrimasYcantidades;
     }
 
-    public void setMateriasPrimasYcantidades(Map<Long, Double> materiasPrimasYcantidades) {
+    public void setMateriasPrimasYcantidades(Map<MateriaPrima, Double> materiasPrimasYcantidades) {
         this.materiasPrimasYcantidades = materiasPrimasYcantidades;
     }
 }

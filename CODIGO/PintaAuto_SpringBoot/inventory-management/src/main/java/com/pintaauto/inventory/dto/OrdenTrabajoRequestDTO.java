@@ -1,5 +1,6 @@
 package com.pintaauto.inventory.dto;
 
+import com.pintaauto.inventory.entity.MateriaPrima;
 import com.pintaauto.inventory.entity.Usuario;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
