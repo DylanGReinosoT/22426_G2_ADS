@@ -14,7 +14,7 @@ public class MateriaPrimaRequestDTO {
 
     @NotNull(message = "La cantidad no puede estar vacía")
     @Min(value = 0, message = "La cantidad debe ser mayor o igual a 0")
-    private Integer cantidad;
+    private Double cantidad;
 
     @NotBlank(message = "Los detalles no pueden estar vacíos")
     @Size(max = 255, message = "Los detalles deben tener un máximo de 255 caracteres")
@@ -27,7 +27,7 @@ public class MateriaPrimaRequestDTO {
     // Constructores
     public MateriaPrimaRequestDTO() {}
 
-    public MateriaPrimaRequestDTO(String nombre, String unidadMedida, Integer cantidad,
+    public MateriaPrimaRequestDTO(String nombre, String unidadMedida, Double cantidad,
                                   String detalles, BigDecimal precioUnitario) {
         this.nombre = nombre;
         this.unidadMedida = unidadMedida;
@@ -43,8 +43,8 @@ public class MateriaPrimaRequestDTO {
     public String getUnidadMedida() { return unidadMedida; }
     public void setUnidadMedida(String unidadMedida) { this.unidadMedida = unidadMedida; }
 
-    public Integer getCantidad() { return cantidad; }
-    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
+    public Double getCantidad() { return cantidad; }
+    public void setCantidad(Double cantidad) { this.cantidad = cantidad; }
 
     public String getDetalles() { return detalles; }
     public void setDetalles(String detalles) { this.detalles = detalles; }

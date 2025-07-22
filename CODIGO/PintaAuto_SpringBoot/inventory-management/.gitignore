@@ -36,3 +36,5 @@ build/
 .env
 .env.local
 .env.*.local
+
+inventory-management/src/main/resources/application.properties

@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,12 +54,32 @@ public class OrdenTrabajoService{
                 .orElseThrow(() -> new RuntimeException("Orden de trabajo no encontrada con ID: " + id));
     }
 
+
+    @Transactional
     // Crear nueva orden de trabajo
     public OrdenTrabajoResponseDTO crear(OrdenTrabajoRequestDTO requestDTO) {
         Usuario user = new Usuario();
+        Map<Long, Double> materiasUsadas = requestDTO.getMateriasPrimasYcantidades();
         user = ordenTrabajoRepository.findUsuarioById(requestDTO.getUsuarioId());
         if (user == null) {
             throw new RuntimeException("Usuario no encontrado con ID: " + requestDTO.getUsuarioId());
+        }
+        for (Map.Entry<Long, Double> entrada : materiasUsadas.entrySet()){
+            Long materiaPrimaId = entrada.getKey();
+            Double cantidadUsada = entrada.getValue();
+
+            // Verificar si la materia prima existe
+            MateriaPrima materiaPrima = materiaPrimaRepository.findById(materiaPrimaId)
+                    .orElseThrow(() -> new RuntimeException("Materia prima no encontrada con ID: " + materiaPrimaId));
+
+            // Verificar si hay suficiente cantidad disponible
+            if (materiaPrima.getCantidad() < cantidadUsada) {
+                throw new RuntimeException("No hay suficiente cantidad de la materia prima '" + materiaPrima.getNombre() + "'");
+            }
+
+            // Actualizar la cantidad de la materia prima
+            materiaPrima.setCantidad(materiaPrima.getCantidad() - cantidadUsada);
+            materiaPrimaRepository.save(materiaPrima);
         }
 
         OrdenTrabajo ordenTrabajo = convertirAEntidad(requestDTO);
@@ -112,28 +134,32 @@ public class OrdenTrabajoService{
     }
 
     private OrdenTrabajoResponseDTO convertirAResponseDTO(OrdenTrabajo ordenTrabajo) {
-        // Suponiendo que tienes un método para convertir Usuario a UsuarioResponseDTO
+        //  convertir Usuario a UsuarioResponseDTO
         UsuarioResponseDTO usuarioDTO = usuarioService.convertirAResponseDTO(ordenTrabajo.getUsuario());
 
-        // Suponiendo que tienes un método para convertir Cliente a ClienteResponseDTO
+        // convertir Cliente a ClienteResponseDTO
         ClienteResponseDTO clienteDTO = clienteService.convertirAResponseDTO(ordenTrabajo.getCliente());
 
-        // Suponiendo que tienes un método para convertir MateriaPrima a MateriaPrimaResponseDTO
-        List<MateriaPrimaResponseDTO> materiasPrimasDTO = ordenTrabajo.getMateriasPrimas().stream()
-            .map(this::convertirMateriaPrimaAResponseDTO)
-            .collect(Collectors.toList());
+        // convertir MateriaPrima a MateriaPrimaResponseDTO
+        Map<Long, Double> materiasPrimasYcantidades = new HashMap<>();
+        for (Map.Entry<MateriaPrima, Double> entry : ordenTrabajo.getMateriasPrimasYcantidades().entrySet()) {
+            materiasPrimasYcantidades.put(entry.getKey().getId(), entry.getValue());
+        }
+        Double valorMateriales = calcularValorMateriales(materiasPrimasYcantidades);
 
         return new OrdenTrabajoResponseDTO(
             ordenTrabajo.getId(),
             ordenTrabajo.getTitulo(),
             ordenTrabajo.getDescripcion(),
+            ordenTrabajo.getVehiculo(),
             ordenTrabajo.getFechaCreacion(),
             ordenTrabajo.getFechaFinalizacion(),
             ordenTrabajo.getHoraCreacion(),
             ordenTrabajo.getHoraFinalizacion(),
             usuarioDTO,
             clienteDTO,
-            materiasPrimasDTO
+            materiasPrimasYcantidades,
+            valorMateriales
         );
     }
 
@@ -153,6 +179,17 @@ public class OrdenTrabajoService{
         );
     }
 
+    public Double calcularValorMateriales(Map<Long, Double> idsYcantidades) {
+        return idsYcantidades.entrySet().stream()
+                .mapToDouble(entry -> {
+                    MateriaPrima materia = materiaPrimaRepository.findById(entry.getKey())
+                            .orElseThrow(() -> new RuntimeException("Materia prima no encontrada con ID: " + entry.getKey()));
+                    return materia.getPrecioUnitario().doubleValue() * entry.getValue();
+                })
+                .sum();
+    }
+
+
     private OrdenTrabajo convertirAEntidad(OrdenTrabajoRequestDTO requestDTO){
         Usuario user = new Usuario();
         // En tu servicio
@@ -160,14 +197,26 @@ public class OrdenTrabajoService{
         user = ordenTrabajoRepository.findUsuarioById(requestDTO.getUsuarioId());
         // Recuperar todas las materias primas por sus IDs
         cliente = ordenTrabajoRepository.findClienteById(requestDTO.getClienteId());
-        List<MateriaPrima> materiasPrimas = materiaPrimaRepository.findAllById(requestDTO.getMateriasPrimasIds());
+//        Map<MateriaPrima, Double> materiasPrimasYcantidades = requestDTO.getMateriasPrimasYcantidades();
+        Map<Long, Double> idsYcantidades = requestDTO.getMateriasPrimasYcantidades(); // tu mapa de entrada
+        Map<MateriaPrima, Double> materiasPrimasYcantidades = new HashMap<>();
+
+        for (Map.Entry<Long, Double> entry : idsYcantidades.entrySet()) {
+            MateriaPrima materia = materiaPrimaRepository.findById(entry.getKey())
+                    .orElseThrow(() -> new RuntimeException("Materia prima no encontrada con ID: " + entry.getKey()));
+            materiasPrimasYcantidades.put(materia, entry.getValue());
+        }
+        Double valorMateriales = calcularValorMateriales(requestDTO.getMateriasPrimasYcantidades());
         return new OrdenTrabajo(
             requestDTO.getTitulo(),
             requestDTO.getDescripcion(),
+            requestDTO.getVehiculo(),
             user,
             cliente,
-            materiasPrimas
+            materiasPrimasYcantidades,
+            valorMateriales
         );
     }
+
 }
 

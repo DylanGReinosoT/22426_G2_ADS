@@ -1,21 +1,26 @@
 package com.pintaauto.inventory.dto;
 
+import com.pintaauto.inventory.entity.MateriaPrima;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 public class OrdenTrabajoResponseDTO {
 
     private Long id;
     private String titulo;
     private String descripcion;
+    private String vehiculo;
     private LocalDateTime fechaCreacion;
     private LocalTime fechaFinalizacion;
     private LocalTime horaCreacion;
     private LocalTime horaFinalizacion;
     private UsuarioResponseDTO usuario;
     private ClienteResponseDTO cliente;
-    private List<MateriaPrimaResponseDTO> materiasPrimas;
+    private Map<Long, Double> materiasPrimasYcantidades;
+    private Double valorMateriales;
 
     // Constructores
 
@@ -23,23 +28,27 @@ public class OrdenTrabajoResponseDTO {
     public OrdenTrabajoResponseDTO(Long id,
                                    String titulo,
                                    String descripcion,
+                                   String vehiculo,
                                    LocalDateTime fechaCreacion,
                                    LocalTime fechaFinalizacion,
                                    LocalTime horaCreacion,
                                    LocalTime horaFinalizacion,
                                    UsuarioResponseDTO usuario,
                                    ClienteResponseDTO cliente,
-                                   List<MateriaPrimaResponseDTO> materiasPrimas) {
+                                   Map<Long, Double> materiasPrimasYcantidades,
+                                   Double valorMateriales) {
         this.id = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
+        this.vehiculo = vehiculo;
         this.fechaCreacion = fechaCreacion;
         this.fechaFinalizacion = fechaFinalizacion;
         this.horaCreacion = horaCreacion;
         this.horaFinalizacion = horaFinalizacion;
         this.usuario = usuario;
         this.cliente = cliente;
-        this.materiasPrimas = materiasPrimas;
+        this.materiasPrimasYcantidades = materiasPrimasYcantidades;
+        this.valorMateriales = valorMateriales;
     }
 
     // Getters y setters
@@ -51,6 +60,9 @@ public class OrdenTrabajoResponseDTO {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public String getVehiculo() {return vehiculo;}
+    public void setVehiculo(String vehiculo) { this.vehiculo = vehiculo;}
 
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
@@ -70,6 +82,15 @@ public class OrdenTrabajoResponseDTO {
     public ClienteResponseDTO getCliente() { return cliente; }
     public void setCliente(ClienteResponseDTO cliente) { this.cliente = cliente; }
 
-    public List<MateriaPrimaResponseDTO> getMateriasPrimas() { return materiasPrimas; }
-    public void setMateriasPrimas(List<MateriaPrimaResponseDTO> materiasPrimas) { this.materiasPrimas = materiasPrimas; }
+    public Map<Long, Double> getMateriasPrimasYcantidades() {
+        return materiasPrimasYcantidades;
+    }
+
+    public Double getValorMateriales() {
+        return valorMateriales;
+    }
+
+    public void setValorMateriales(Double valorMateriales) {
+        this.valorMateriales = valorMateriales;
+    }
 }
