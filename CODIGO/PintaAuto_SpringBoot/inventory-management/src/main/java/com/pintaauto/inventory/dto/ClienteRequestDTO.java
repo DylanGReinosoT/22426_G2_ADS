@@ -1,5 +1,7 @@
 package com.pintaauto.inventory.dto;
 
+import com.pintaauto.inventory.validation.CedulaEcuatoriana;
+import com.pintaauto.inventory.validation.MayorEdad;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
@@ -18,10 +20,12 @@ public class ClienteRequestDTO {
     @Size(min = 3, max = 80, message = "El apellido no puede exceder los 80 caracteres")
     private String apellido;
 
+    @CedulaEcuatoriana
     @NotBlank(message = "La cédula no puede estar vacía")
     @Size(max = 10, message = "La cédula debe tener máximo 10 caracteres")
     private String cedula;
 
+    @MayorEdad
     @NotNull(message = "La fecha de nacimiento no puede estar vacía")
     @Temporal(TemporalType.DATE)
     private Date fechaNacimiento;

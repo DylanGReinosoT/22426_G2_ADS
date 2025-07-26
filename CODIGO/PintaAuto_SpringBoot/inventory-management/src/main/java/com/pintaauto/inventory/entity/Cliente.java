@@ -2,6 +2,7 @@ package com.pintaauto.inventory.entity;
 
 
 import com.pintaauto.inventory.validation.CedulaEcuatoriana;
+import com.pintaauto.inventory.validation.MayorEdad;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,6 +33,7 @@ public class Cliente {
     @Column(nullable = false, unique = true, length = 10)
     private String cedula;
 
+    @MayorEdad
     @NotNull(message = "La fecha de nacimiento no puede estar vacía")
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha_nacimiento")
