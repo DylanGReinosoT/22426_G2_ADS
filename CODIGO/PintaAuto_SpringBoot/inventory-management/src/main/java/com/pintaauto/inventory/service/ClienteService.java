@@ -6,8 +6,10 @@ import com.pintaauto.inventory.dto.UsuarioResponseDTO;
 import com.pintaauto.inventory.entity.Cliente;
 import com.pintaauto.inventory.entity.Usuario;
 import com.pintaauto.inventory.repository.ClienteRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,11 +32,16 @@ public class ClienteService {
         return toResponseDTO(cliente);
     }
 
-    public ClienteResponseDTO crear(ClienteRequestDTO requestDTO) {
+    // se hace el uso de @Valid para validar el DTO con las anotaciones de validación
+    public ClienteResponseDTO crear(@Valid @RequestBody ClienteRequestDTO requestDTO) {
         Cliente cliente = toEntity(requestDTO);
-        // Validar cédula ecuatoriana
+        // Validar que cédula no se repita
         if (clienteRepository.existsByCedula(cliente.getCedula())) {
             throw new RuntimeException("Ya existe un cliente con la cédula proporcionada");
+        }
+        //validar que el email no se repita
+        if (clienteRepository.existsByEmail(cliente.getEmail())) {
+            throw new RuntimeException("Ya existe un cliente con el email proporcionado");
         }
         Cliente guardado = clienteRepository.save(cliente);
         return toResponseDTO(guardado);

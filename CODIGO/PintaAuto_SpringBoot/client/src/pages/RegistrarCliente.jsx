@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import clienteService from '../services/ClienteService'
-import { FiUser, FiUserCheck, FiCreditCard, FiCalendar, FiPhone, FiMail, FiMapPin, FiSave, FiX } from 'react-icons/fi'
-import { motion } from 'framer-motion'
+import { FiUser, FiUserCheck, FiCreditCard, FiCalendar, FiPhone, FiMail, FiMapPin, FiSave, FiX, FiAlertCircle, FiInfo } from 'react-icons/fi'
+import { motion, AnimatePresence } from 'framer-motion'
 
 const RegistrarCliente = () => {
   const [cliente, setCliente] = useState({
@@ -16,6 +16,7 @@ const RegistrarCliente = () => {
   })
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({})
+  const [showErrorAlert, setShowErrorAlert] = useState(false)
   const navigate = useNavigate()
 
   const handleChange = (e) => {
@@ -30,6 +31,12 @@ const RegistrarCliente = () => {
         ...prev,
         [name]: ''
       }))
+      // Si se corrigió un error, verificar si ya no hay más errores para ocultar el alert
+      const updatedErrors = { ...errors, [name]: '' }
+      const hasRemainingErrors = Object.values(updatedErrors).some(error => error !== '')
+      if (!hasRemainingErrors) {
+        setShowErrorAlert(false)
+      }
     }
   }
 
@@ -71,7 +78,9 @@ const RegistrarCliente = () => {
     }
     
     setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
+    const hasErrors = Object.keys(newErrors).length > 0
+    setShowErrorAlert(hasErrors)
+    return !hasErrors
   }
 
   const handleSubmit = async (e) => {
@@ -101,16 +110,69 @@ const RegistrarCliente = () => {
         direccion: ''
       })
       
+      // Limpiar errores y ocultar alert
+      setErrors({})
+      setShowErrorAlert(false)
+      
       // Animación de éxito
       alert('Cliente registrado exitosamente')
       navigate('/dashboard/cliente')
     } catch (error) {
       console.error('Error al registrar cliente:', error)
-      alert('Error al registrar cliente')
+      
+      if (error.response && error.response.data) {
+        const backendData = error.response.data
+        
+        // Caso 1: Errores de validación (formato { "campo": "mensaje" })
+        if (typeof backendData === 'object' && 
+            !backendData.hasOwnProperty('success') && 
+            !backendData.hasOwnProperty('mensaje') && 
+            !backendData.hasOwnProperty('error')) {
+          
+          // Es un objeto con errores de validación directos
+          setErrors(prev => ({
+            ...prev,
+            ...backendData
+          }))
+          setShowErrorAlert(true)
+        } 
+        // Caso 2: Respuesta ApiResponse con error
+        else if (backendData.error) {
+          alert('Error al registrar cliente: ' + backendData.error)
+        } 
+        // Caso 3: Respuesta ApiResponse con mensaje
+        else if (backendData.mensaje) {
+          alert('Error al registrar cliente: ' + backendData.mensaje)
+        } 
+        // Caso 4: String directo (mensaje de error largo)
+        else if (typeof backendData === 'string') {
+          // Extraer solo el mensaje importante del error largo
+          const match = backendData.match(/'([^']+)'/g)
+          if (match && match.length > 0) {
+            // Tomar el primer mensaje entre comillas
+            const cleanMessage = match[0].replace(/'/g, '')
+            setErrors(prev => ({
+              ...prev,
+              general: cleanMessage
+            }))
+            setShowErrorAlert(true)
+          } else {
+            alert('Error al registrar cliente')
+          }
+        } 
+        // Caso 5: Error no reconocido
+        else {
+          alert('Error al registrar cliente')
+        }
+      } else {
+        // Error de red o conexión
+        alert('Error de conexión. Verifique su conexión a internet.')
+      }
     } finally {
       setLoading(false)
     }
   }
+
 
   // Animaciones
   const containerVariants = {
@@ -194,13 +256,75 @@ const RegistrarCliente = () => {
           className="bg-white bg-opacity-10 backdrop-blur-lg rounded-b-xl shadow-2xl p-8 border border-white border-opacity-10"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Recuadro Informativo de Errores */}
+            <AnimatePresence>
+              {showErrorAlert && Object.keys(errors).length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="bg-red-900 bg-opacity-30 border-2 border-red-500 rounded-lg p-4 mb-6 backdrop-blur-sm"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <FiAlertCircle className="text-red-400 text-xl mt-0.5 animate-pulse" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-red-300 font-semibold text-lg mb-2 flex items-center gap-2">
+                        <FiInfo className="text-red-400" />
+                        Se encontraron los siguientes errores:
+                      </h3>
+                      <ul className="space-y-1">
+                        {Object.entries(errors).map(([field, error]) => 
+                          error && (
+                            <motion.li 
+                              key={field}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: 0.1 }}
+                              className="text-red-200 text-sm flex items-center gap-2"
+                            >
+                              <span className="w-1.5 h-1.5 bg-red-400 rounded-full flex-shrink-0"></span>
+                              <span className="font-medium capitalize">{field.replace(/([A-Z])/g, ' $1')}:</span>
+                              <span>{error}</span>
+                            </motion.li>
+                          )
+                        )}
+                      </ul>
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.5 }}
+                        className="mt-3 pt-3 border-t border-red-500 border-opacity-30"
+                      >
+                        <p className="text-red-300 text-xs flex items-center gap-2">
+                          <FiInfo className="text-red-400" />
+                          Por favor, corrija los errores marcados en rojo para continuar.
+                        </p>
+                      </motion.div>
+                    </div>
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setShowErrorAlert(false)}
+                      className="flex-shrink-0 p-1 rounded-full hover:bg-red-700 hover:bg-opacity-30 transition-all"
+                    >
+                      <FiX className="text-red-400 text-lg" />
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            
             {/* Nombre y Apellido */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <motion.div 
                 variants={itemVariants}
                 className="group"
               >
-                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                <label className="flex text-gray-200 font-medium mb-2 items-center gap-2">
                   <FiUser className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Nombre *
                 </label>
@@ -210,7 +334,7 @@ const RegistrarCliente = () => {
                     name="nombre"
                     value={cliente.nombre}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-gray-300 bg-opacity-30 text-white placeholder-gray-400 ${
                       errors.nombre ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese el nombre"
@@ -231,7 +355,7 @@ const RegistrarCliente = () => {
                 variants={itemVariants}
                 className="group"
               >
-                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                <label className="flex text-gray-200 font-medium mb-2 items-center gap-2">
                   <FiUserCheck className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Apellido *
                 </label>
@@ -241,7 +365,7 @@ const RegistrarCliente = () => {
                     name="apellido"
                     value={cliente.apellido}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-gray-300 bg-opacity-30 text-white placeholder-gray-400 ${
                       errors.apellido ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese el apellido"
@@ -265,7 +389,7 @@ const RegistrarCliente = () => {
                 variants={itemVariants}
                 className="group"
               >
-                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                <label className="flex text-gray-200 font-medium mb-2 items-center gap-2">
                   <FiCreditCard className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Cédula *
                 </label>
@@ -275,7 +399,7 @@ const RegistrarCliente = () => {
                     name="cedula"
                     value={cliente.cedula}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-gray-300 bg-opacity-30 text-white placeholder-gray-400 ${
                       errors.cedula ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese la cédula (10 dígitos)"
@@ -297,7 +421,7 @@ const RegistrarCliente = () => {
                 variants={itemVariants}
                 className="group"
               >
-                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                <label className="flex text-gray-200 font-medium mb-2 items-center gap-2">
                   <FiCalendar className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Fecha de Nacimiento *
                 </label>
@@ -307,7 +431,7 @@ const RegistrarCliente = () => {
                     name="fechaNacimiento"
                     value={cliente.fechaNacimiento}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-gray-300 bg-opacity-30 text-white placeholder-gray-400 ${
                       errors.fechaNacimiento ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                   />
@@ -330,7 +454,7 @@ const RegistrarCliente = () => {
                 variants={itemVariants}
                 className="group"
               >
-                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                <label className="flex text-gray-200 font-medium mb-2 items-center gap-2">
                   <FiPhone className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Teléfono *
                 </label>
@@ -340,7 +464,7 @@ const RegistrarCliente = () => {
                     name="telefono"
                     value={cliente.telefono}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-gray-300 bg-opacity-30 text-white placeholder-gray-400 ${
                       errors.telefono ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese el teléfono (10 dígitos)"
@@ -362,7 +486,7 @@ const RegistrarCliente = () => {
                 variants={itemVariants}
                 className="group"
               >
-                <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+                <label className="flex text-gray-200 font-medium mb-2 items-center gap-2">
                   <FiMail className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                   Email *
                 </label>
@@ -372,7 +496,7 @@ const RegistrarCliente = () => {
                     name="email"
                     value={cliente.email}
                     onChange={handleChange}
-                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                    className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-gray-300 bg-opacity-30 text-white placeholder-gray-400 ${
                       errors.email ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                     }`}
                     placeholder="Ingrese el email"
@@ -395,7 +519,7 @@ const RegistrarCliente = () => {
               variants={itemVariants}
               className="group"
             >
-              <label className="block text-gray-200 font-medium mb-2 flex items-center gap-2">
+              <label className="flex text-gray-200 font-medium mb-2 items-center gap-2">
                 <FiMapPin className="text-red-400 group-hover:text-red-300 transition-all transform group-hover:scale-110" />
                 Dirección *
               </label>
@@ -405,7 +529,7 @@ const RegistrarCliente = () => {
                   value={cliente.direccion}
                   onChange={handleChange}
                   rows={3}
-                  className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-black bg-opacity-30 text-white placeholder-gray-400 ${
+                  className={`w-full pl-4 pr-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-gray-300 bg-opacity-30 text-white placeholder-gray-400 ${
                     errors.direccion ? 'border-red-500 animate-pulse' : 'border-gray-600 hover:border-red-500'
                   }`}
                   placeholder="Ingrese la dirección completa"

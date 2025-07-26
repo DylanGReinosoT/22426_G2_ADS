@@ -1,6 +1,7 @@
 package com.pintaauto.inventory.entity;
 
 
+import com.pintaauto.inventory.validation.CedulaEcuatoriana;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,6 +26,7 @@ public class Cliente {
     @Column(nullable = false, length = 80)
     private String apellido;
 
+    @CedulaEcuatoriana
     @NotBlank(message = "La cédula no puede estar vacía")
     @Size( max = 10, message = "La cédula debe sobrepasar los 10 caracteres")
     @Column(nullable = false, unique = true, length = 10)
