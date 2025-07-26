@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ordenTrabajoService from '../services/OrdenTrabajoService'
+import materiaprimaService from '../services/materiaPrimaService' // ✅ DESCOMENTADO
 import { FiEdit, FiTrash2, FiPlus, FiEye } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -9,7 +10,67 @@ const OrdenesTrabajo = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [currentOrden, setCurrentOrden] = useState(null);
+  const [materiasCache, setMateriasCache] = useState(new Map()); 
+  const [loadingMaterias, setLoadingMaterias] = useState(false);
   const navigate = useNavigate()
+
+  const obtenerMateriasPrimasCompletas = async (materiasPrimasYcantidades) => {
+    if (!materiasPrimasYcantidades || Object.keys(materiasPrimasYcantidades).length === 0) {
+      return [];
+    }
+
+
+    const materiasCompletas = [];
+    
+    try {
+      // Procesar cada materia prima del mapa
+      for (const [materiaPrimaId, cantidad] of Object.entries(materiasPrimasYcantidades)) {
+        const id = parseInt(materiaPrimaId);
+        
+        // Verificar si ya tenemos los datos en caché
+        if (materiasCache.has(id)) {
+          const materia = materiasCache.get(id);
+          materiasCompletas.push({
+            ...materia,
+            cantidadUsada: cantidad
+          });
+        } else {
+          try {
+            // Obtener datos del backend
+            const res = await materiaprimaService.obtenerPorId(id);
+            console.log(`Response para materia prima ${id}:`, res); // Debug
+            
+            // Verificar la estructura del response
+            const materia = res.datos || res; // Intentar ambas estructuras
+            
+            // Guardar en caché
+            setMateriasCache(prev => new Map(prev.set(id, materia)));
+            
+            materiasCompletas.push({
+              ...materia,
+              cantidadUsada: cantidad
+            });
+            console.log(`Materia Prima ${id} cargada:`, materia);
+          } catch (error) {
+            console.error(`Error al obtener materia prima ${id}:`, error);
+            // Fallback con datos mínimos
+            materiasCompletas.push({
+              id: id,
+              nombre: `Materia Prima ${id}`,
+              unidadMedida: 'N/A',
+              cantidadUsada: cantidad,
+              precioUnitario: 0
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error general al obtener materias primas:', error);
+    }
+    
+    return materiasCompletas;
+  };
+
 
   const cargarOrdenes = async () => {
     try {
@@ -38,10 +99,28 @@ const OrdenesTrabajo = () => {
     }
   }
 
-  const openDetailsModal = (orden) => {
-    setCurrentOrden(orden)
-    setShowModal(true)
-  }
+  const openDetailsModal = async (orden) => {
+    setCurrentOrden(orden);
+    setShowModal(true);
+    
+    // Si la orden tiene materias primas, cargar los datos completos
+    if (orden.materiasPrimasYcantidades && Object.keys(orden.materiasPrimasYcantidades).length > 0) {
+      setLoadingMaterias(true);
+      try {
+        const materiasCompletas = await obtenerMateriasPrimasCompletas(orden.materiasPrimasYcantidades);
+        
+        // Actualizar la orden actual con las materias primas completas
+        setCurrentOrden(prev => ({
+          ...prev,
+          materiasPrimas: materiasCompletas
+        }));
+      } catch (error) {
+        console.error('Error al cargar materias primas completas:', error);
+      } finally {
+        setLoadingMaterias(false);
+      }
+    }
+  };
 
   if (loading) return (
     <div className="flex justify-center items-center h-screen bg-gradient-to-br from-black to-red-900">
@@ -227,30 +306,74 @@ const OrdenesTrabajo = () => {
                 <h4 className="font-semibold text-lg mb-3 bg-gradient-to-r from-red-600 to-red-800 bg-clip-text text-transparent">
                   Materias Primas a usar
                 </h4>
-                <div className="border border-gray-700 rounded-lg overflow-hidden">
-                  <table className="min-w-full divide-y divide-gray-700">
-                    <thead className="bg-gradient-to-r from-black to-red-900">
-                      <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Nombre</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Cantidad</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Unidad</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-700">
-                      {currentOrden.materiasPrimas?.map((mp) => (
-                        <motion.tr 
-                          key={mp.id}
-                          whileHover={{ backgroundColor: 'rgba(127, 29, 29, 0.1)' }}
-                          className="bg-gray-800/50"
-                        >
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{mp.nombre}</td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{mp.cantidad}</td>
-                          <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{mp.unidadMedida}</td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                
+                {/* ✅ NUEVO: Mostrar loading específico para materias */}
+                {loadingMaterias ? (
+                  <div className="flex justify-center items-center py-8">
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="rounded-full h-8 w-8 border-t-2 border-b-2 border-red-500"
+                    ></motion.div>
+                    <span className="ml-3 text-gray-300">Cargando materias primas...</span>
+                  </div>
+                ) : (
+                  <div className="border border-gray-700 rounded-lg overflow-hidden">
+                    <table className="min-w-full divide-y divide-gray-700">
+                      <thead className="bg-gradient-to-r from-black to-red-900">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Nombre</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Cantidad Usada</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Unidad</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Precio Unit.</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-white uppercase">Subtotal</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-700">
+                        {currentOrden.materiasPrimas?.length > 0 ? (
+                          currentOrden.materiasPrimas.map((mp, index) => (
+                            <motion.tr 
+                              key={mp.id || index}
+                              whileHover={{ backgroundColor: 'rgba(127, 29, 29, 0.1)' }}
+                              className="bg-gray-800/50"
+                            >
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{mp.nombre}</td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{mp.cantidadUsada}</td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">{mp.unidadMedida}</td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-300">
+                                ${mp.precioUnitario?.toFixed(2) || '0.00'}
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-green-400 font-semibold">
+                                ${((mp.cantidadUsada || 0) * (mp.precioUnitario || 0)).toFixed(2)}
+                              </td>
+                            </motion.tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="5" className="px-4 py-8 text-center text-gray-400">
+                              No hay materias primas asignadas a esta orden
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                      {/* ✅ NUEVO: Total de materiales */}
+                      {currentOrden.materiasPrimas?.length > 0 && (
+                        <tfoot className="bg-gray-900">
+                          <tr>
+                            <td colSpan="4" className="px-4 py-3 text-right text-sm font-semibold text-white">
+                              Total Materiales:
+                            </td>
+                            <td className="px-4 py-3 whitespace-nowrap text-sm font-bold text-green-400">
+                              ${currentOrden.materiasPrimas.reduce((total, mp) => 
+                                total + ((mp.cantidadUsada || 0) * (mp.precioUnitario || 0)), 0
+                              ).toFixed(2)}
+                            </td>
+                          </tr>
+                        </tfoot>
+                      )}
+                    </table>
+                  </div>
+                )}
               </div>
               
               <div className="flex justify-end">

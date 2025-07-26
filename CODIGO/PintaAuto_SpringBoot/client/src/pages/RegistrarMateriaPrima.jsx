@@ -6,7 +6,7 @@ import materiaprimaService from '../services/materiaPrimaService';
 const UNIDADES_MEDIDA = [
   { value: 'kg', label: 'Kilogramos (kg)' },
   { value: 'g', label: 'Gramos (g)' },
-  { value: 'l', label: 'Litros (l)' },
+  { value: 'L', label: 'Litros (l)' },
   { value: 'ml', label: 'Mililitros (ml)' },
   { value: 'unidades', label: 'Unidades' }
 ];

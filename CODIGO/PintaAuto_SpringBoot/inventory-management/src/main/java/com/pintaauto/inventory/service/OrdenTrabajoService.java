@@ -146,6 +146,9 @@ public class OrdenTrabajoService{
             materiasPrimasYcantidades.put(entry.getKey().getId(), entry.getValue());
         }
         Double valorMateriales = calcularValorMateriales(materiasPrimasYcantidades);
+        Map<MateriaPrima, Double> materiasPrimas = ordenTrabajo.getMateriasPrimasYcantidades().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
 
         return new OrdenTrabajoResponseDTO(
             ordenTrabajo.getId(),

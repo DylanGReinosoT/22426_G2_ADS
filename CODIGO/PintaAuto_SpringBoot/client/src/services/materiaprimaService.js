@@ -7,8 +7,8 @@ const materiaprimaService = {
         return response.data;
     },
     
-    obtenerporId: async (id) => {
-        const response = await api.get(`/materia${id}`);
+    obtenerPorId: async (id) => {
+        const response = await api.get(`/materia/${id}`);
         return response.data;
     },
 
@@ -25,7 +25,9 @@ const materiaprimaService = {
     eliminar: async (id) => {
         const response = await api.delete(`/materia/${id}`);
         return response.data;
-    }
+    },
+    // Buscar por nombre
+  buscarPorNombre: (nombre) => api.get(`/materia/buscar?nombre=${nombre}`)
 };
 
 export default materiaprimaService;
