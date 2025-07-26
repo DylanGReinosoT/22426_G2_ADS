@@ -32,6 +32,10 @@ public class ClienteService {
 
     public ClienteResponseDTO crear(ClienteRequestDTO requestDTO) {
         Cliente cliente = toEntity(requestDTO);
+        // Validar cédula ecuatoriana
+        if (clienteRepository.existsByCedula(cliente.getCedula())) {
+            throw new RuntimeException("Ya existe un cliente con la cédula proporcionada");
+        }
         Cliente guardado = clienteRepository.save(cliente);
         return toResponseDTO(guardado);
     }

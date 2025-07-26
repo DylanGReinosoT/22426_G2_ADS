@@ -14,7 +14,7 @@ public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    // comentario test
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(min = 3, max = 80, message = "El nombre no puede exceder los 80 caracteres")
     @Column(nullable = false, length = 80)
@@ -49,7 +49,6 @@ public class Cliente {
     @Size(max = 255, message = "La dirección no puede exceder los 255 caracteres")
     @Column(nullable = false, length = 255)
     private String direccion;
-
 
 
     // Constructores

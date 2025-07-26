@@ -21,6 +21,9 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     // Verificar si existe un cliente con un email específico
     boolean existsByEmail(String email);
 
+    //Verificar si existe un cliente con una cédula específica
+    boolean existsByCedula(String cedula);
+
     // Verificar si existe un cliente con un email específico excluyendo un ID
     @Query("SELECT COUNT(c) > 0 FROM Cliente c WHERE LOWER(c.email) = LOWER(:email) AND c.id != :id")
     boolean existsByEmailAndIdNot(@Param("email") String email, @Param("id") Long id);
