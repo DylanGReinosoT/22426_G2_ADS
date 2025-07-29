@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
+
 
 import java.util.Date;
 
@@ -18,12 +20,15 @@ public class Cliente {
     private Long id;
     // comentario test
     @NotBlank(message = "El nombre no puede estar vacío")
-    @Size(min = 3, max = 80, message = "El nombre no puede exceder los 80 caracteres")
+    @Size(min = 3, max = 80, message = "El nombre debe tener entre 3 y 80 caracteres")
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$", message = "El nombre solo puede contener letras y espacios")
     @Column(nullable = false, length = 80)
     private String nombre;
 
+
     @NotBlank(message = "El apellido no puede estar vacío")
     @Size(min = 3, max = 80, message = "El nombre no puede exceder los 80 caracteres")
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$", message = "El apellido solo puede contener letras y espacios")
     @Column(nullable = false, length = 80)
     private String apellido;
 
