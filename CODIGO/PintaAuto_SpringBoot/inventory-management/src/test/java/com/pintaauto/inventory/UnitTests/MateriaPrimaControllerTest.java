@@ -1,10 +1,12 @@
 package com.pintaauto.inventory.UnitTests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import com.pintaauto.inventory.controller.MateriaPrimaController;
 import com.pintaauto.inventory.dto.ApiResponse;
 import com.pintaauto.inventory.dto.MateriaPrimaRequestDTO;
 import com.pintaauto.inventory.dto.MateriaPrimaResponseDTO;
+import com.pintaauto.inventory.security.JwtAuthenticationFilter;
 import com.pintaauto.inventory.service.MateriaPrimaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +14,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -29,7 +34,14 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(MateriaPrimaController.class)
+@WebMvcTest(
+        controllers = MateriaPrimaController.class,
+        excludeFilters = @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                classes = {JwtAuthenticationFilter.class}
+        )
+)
+@WithMockUser
 public class MateriaPrimaControllerTest {
 
     @Autowired
@@ -68,18 +80,21 @@ public class MateriaPrimaControllerTest {
         materiaPrimaRequestDTO.setDetalles("Pintura de alta calidad color blanco");
         materiaPrimaRequestDTO.setPrecioUnitario(new BigDecimal("25.50"));
     }
-
+    @WithMockUser
     @Test
     void testObtenerTodas_DebeRetornarListaDeMateriasPrimas() throws Exception {
+
+
         // Given
         List<MateriaPrimaResponseDTO> materias = Arrays.asList(materiaPrimaResponseDTO);
         when(materiaPrimaService.obtenerTodas()).thenReturn(materias);
 
         // When & Then
         mockMvc.perform(get("/api/materia"))
+
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(true))
+                .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.mensaje").value("Materias obtenidas correctamente"))
                 .andExpect(jsonPath("$.datos.materias").isArray())
                 .andExpect(jsonPath("$.datos.materias[0].id").value(1))
@@ -88,7 +103,7 @@ public class MateriaPrimaControllerTest {
                 .andExpect(jsonPath("$.datos.materias[0].cantidad").value(10.0))
                 .andExpect(jsonPath("$.datos.materias[0].precioUnitario").value(25.50));
     }
-
+    @WithMockUser
     @Test
     void testObtenerTodas_CuandoOcurreError_DebeRetornarError() throws Exception {
         // Given
@@ -99,7 +114,7 @@ public class MateriaPrimaControllerTest {
         mockMvc.perform(get("/api/materia"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(false))
+                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.mensaje").value("Error al obtener la lista de materias"));
     }
 
@@ -112,7 +127,7 @@ public class MateriaPrimaControllerTest {
         mockMvc.perform(get("/api/materia/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(true))
+                .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.mensaje").value("Materia encontrada"))
                 .andExpect(jsonPath("$.datos.id").value(1))
                 .andExpect(jsonPath("$.datos.nombre").value("Pintura Blanca"))
@@ -129,7 +144,7 @@ public class MateriaPrimaControllerTest {
         mockMvc.perform(get("/api/materia/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(false))
+                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.mensaje").value("Materia no encontrada"));
     }
 
@@ -143,7 +158,7 @@ public class MateriaPrimaControllerTest {
         mockMvc.perform(get("/api/materia/1"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(false))
+                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.mensaje").value("Error al obtener la materia"));
     }
 
@@ -159,7 +174,7 @@ public class MateriaPrimaControllerTest {
                 .content(objectMapper.writeValueAsString(materiaPrimaRequestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(true))
+                .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.mensaje").value("Materia creada correctamente"))
                 .andExpect(jsonPath("$.datos.id").value(1))
                 .andExpect(jsonPath("$.datos.nombre").value("Pintura Blanca"))
@@ -178,7 +193,7 @@ public class MateriaPrimaControllerTest {
                 .content(objectMapper.writeValueAsString(materiaPrimaRequestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(false))
+                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.mensaje").value("La materia prima con el nombre 'Pintura Blanca' ya existe"));
     }
 
@@ -229,7 +244,7 @@ public class MateriaPrimaControllerTest {
                 .content(objectMapper.writeValueAsString(requestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(true))
+                .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.mensaje").value("Materia actualizada correctamente"))
                 .andExpect(jsonPath("$.datos.nombre").value("Pintura Roja"))
                 .andExpect(jsonPath("$.datos.cantidad").value(15.0))
@@ -248,7 +263,7 @@ public class MateriaPrimaControllerTest {
                 .content(objectMapper.writeValueAsString(materiaPrimaRequestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(false))
+                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.mensaje").value("Materia prima no encontrada con ID: 99"));
     }
 
@@ -261,7 +276,7 @@ public class MateriaPrimaControllerTest {
         mockMvc.perform(delete("/api/materia/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(true))
+                .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.mensaje").value("Materia eliminada correctamente"));
     }
 
@@ -276,7 +291,7 @@ public class MateriaPrimaControllerTest {
         mockMvc.perform(delete("/api/materia/99"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(false));
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
@@ -290,7 +305,7 @@ public class MateriaPrimaControllerTest {
                 .param("nombre", "Pintura"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(true))
+                .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.datos").isArray())
                 .andExpect(jsonPath("$.datos[0].nombre").value("Pintura Blanca"));
     }
@@ -305,7 +320,7 @@ public class MateriaPrimaControllerTest {
                 .param("nombre", "NoExiste"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.exito").value(true))
+                .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.datos").isArray())
                 .andExpect(jsonPath("$.datos").isEmpty());
     }
