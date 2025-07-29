@@ -32,6 +32,8 @@ public class OrdenTrabajoRequestDTO {
     private Map<Long,Double> materiasPrimasYcantidades;
 
     // Constructores
+    public OrdenTrabajoRequestDTO() {}
+    
     public OrdenTrabajoRequestDTO(String titulo,
                                   String descripcion,
                                   String vehiculo,
@@ -69,5 +71,9 @@ public class OrdenTrabajoRequestDTO {
 
     public Map<Long, Double> getMateriasPrimasYcantidades() {
         return materiasPrimasYcantidades;
+    }
+
+    public void setMateriasPrimasYcantidades(Map<Long, Double> materiasPrimasYcantidades) {
+        this.materiasPrimasYcantidades = materiasPrimasYcantidades;
     }
 }

@@ -23,7 +23,8 @@ public class OrdenTrabajoResponseDTO {
     private Double valorMateriales;
 
     // Constructores
-
+    
+    public OrdenTrabajoResponseDTO() {}
 
     public OrdenTrabajoResponseDTO(Long id,
                                    String titulo,
@@ -84,6 +85,10 @@ public class OrdenTrabajoResponseDTO {
 
     public Map<Long, Double> getMateriasPrimasYcantidades() {
         return materiasPrimasYcantidades;
+    }
+
+    public void setMateriasPrimasYcantidades(Map<Long, Double> materiasPrimasYcantidades) {
+        this.materiasPrimasYcantidades = materiasPrimasYcantidades;
     }
 
     public Double getValorMateriales() {
