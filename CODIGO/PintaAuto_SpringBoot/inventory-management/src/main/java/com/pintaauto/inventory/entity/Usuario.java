@@ -16,10 +16,12 @@ public class Usuario {
     private Long id;
 
     @NotBlank(message = "El nombre no puede estar vacío")
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$", message = "El nombre solo puede contener letras y espacios")
     @Column(nullable = false)
     private String nombre;
 
     @NotBlank(message = "El apellido no puede estar vacío")
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+$", message = "El apellido solo puede contener letras y espacios")
     @Column(nullable = false)
     private String apellido;
 

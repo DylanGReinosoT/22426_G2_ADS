@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ordenTrabajoService from '../services/OrdenTrabajoService'
-import materiaprimaService from '../services/materiaPrimaService' // ✅ DESCOMENTADO
-import { FiEdit, FiTrash2, FiPlus, FiEye } from 'react-icons/fi'
+import materiaprimaService from '../services/materiaPrimaService'
+import clienteService from '../services/ClienteService'
+import { FiEdit, FiTrash2, FiPlus, FiEye, FiSave, FiX } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const OrdenesTrabajo = () => {
@@ -12,7 +13,22 @@ const OrdenesTrabajo = () => {
   const [currentOrden, setCurrentOrden] = useState(null);
   const [materiasCache, setMateriasCache] = useState(new Map()); 
   const [loadingMaterias, setLoadingMaterias] = useState(false);
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingOrden, setEditingOrden] = useState(null);
+  const [formData, setFormData] = useState({
+    titulo: '',
+    descripcion: '',
+    vehiculo: '',
+    clienteId: '',
+    materiasPrimasYcantidades: {}
+  });
+  const [clientes, setClientes] = useState([]);
+  const [materiasPrimas, setMateriasPrimas] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [selectedMaterias, setSelectedMaterias] = useState([]);
   const navigate = useNavigate()
+  const [dataLoaded, setDataLoaded] = useState(false);
 
   const obtenerMateriasPrimasCompletas = async (materiasPrimasYcantidades) => {
     if (!materiasPrimasYcantidades || Object.keys(materiasPrimasYcantidades).length === 0) {
@@ -71,6 +87,130 @@ const OrdenesTrabajo = () => {
     return materiasCompletas;
   };
 
+  const cargarClientes = async () => {
+    try {
+      const res = await clienteService.obtenerTodos();
+      setClientes(res.datos || []);
+    } catch (error) {
+      console.error('Error al cargar clientes:', error);
+    }
+  };
+  
+  const cargarMateriasPrimas = async () => {
+    try {
+      const res = await materiaprimaService.obtenerTodas();
+      console.log('Respuesta materias primas:', res);
+
+      setMateriasPrimas(res.datos?.materias || []);
+    } catch (error) {
+      console.error('Error al cargar materias primas:', error);
+      setMateriasPrimas([]); 
+    }
+  };
+  
+  const openEditModal = async (orden) => {
+    setEditingOrden(orden);
+    
+    // Cargar datos necesarios si no están cargados
+    if (clientes.length === 0) await cargarClientes();
+    if (materiasPrimas.length === 0) await cargarMateriasPrimas();
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Preparar materias primas seleccionadas
+    const materiasSeleccionadas = [];
+    if (orden.materiasPrimasYcantidades) {
+      for (const [materiaPrimaId, cantidad] of Object.entries(orden.materiasPrimasYcantidades)) {
+        materiasSeleccionadas.push({
+          materiaPrimaId: parseInt(materiaPrimaId),
+          cantidad: cantidad
+        });
+      }
+    }
+    
+    // Configurar datos del formulario
+    setFormData({
+      titulo: orden.titulo || '',
+      descripcion: orden.descripcion || '',
+      vehiculo: orden.vehiculo || '',
+      clienteId: orden.cliente?.id || '',
+      materiasPrimasYcantidades: orden.materiasPrimasYcantidades || {}
+    });
+    
+    setSelectedMaterias(materiasSeleccionadas);
+    setShowEditModal(true);
+  };
+  
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const agregarMateriaPrima = () => {
+    setSelectedMaterias(prev => [...prev, { materiaPrimaId: '', cantidad: 0 }]);
+  };
+  
+  const eliminarMateriaPrima = (index) => {
+    setSelectedMaterias(prev => prev.filter((_, i) => i !== index));
+  };
+  
+  const handleMateriaChange = (index, field, value) => {
+    setSelectedMaterias(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+  
+  const handleSubmitEdit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    
+    try {
+      // Convertir materias seleccionadas a formato del backend
+      const materiasPrimasMap = {};
+      selectedMaterias.forEach(materia => {
+        if (materia.materiaPrimaId && materia.cantidad > 0) {
+          materiasPrimasMap[materia.materiaPrimaId] = parseFloat(materia.cantidad);
+        }
+      });
+      
+      const dataToSend = {
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        vehiculo: formData.vehiculo,
+        clienteId: parseInt(formData.clienteId),
+        usuarioId: editingOrden.usuario?.id, // Mantener el usuario actual
+        materiasPrimasYcantidades: materiasPrimasMap
+      };
+      
+      console.log('Enviando datos:', dataToSend);
+      
+      const response = await ordenTrabajoService.actualizar(editingOrden.id, dataToSend);
+      
+      // Actualizar la lista local
+      setOrdenes(prev => 
+        prev.map(orden => 
+          orden.id === editingOrden.id ? response.datos : orden
+        )
+      );
+      
+      setShowEditModal(false);
+      setEditingOrden(null);
+      
+      // Mostrar mensaje de éxito (opcional)
+      alert('Orden actualizada correctamente');
+      
+    } catch (error) {
+      console.error('Error al actualizar orden:', error);
+      alert('Error al actualizar la orden');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const cargarOrdenes = async () => {
     try {
@@ -85,8 +225,17 @@ const OrdenesTrabajo = () => {
   };
 
   useEffect(() => {
-    cargarOrdenes()
-  }, [])
+  const cargarDatosIniciales = async () => {
+    await Promise.all([
+      cargarOrdenes(),
+      cargarClientes(),
+      cargarMateriasPrimas()
+    ]);
+    setDataLoaded(true);
+  };
+  
+  cargarDatosIniciales();
+}, []);
 
   const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar esta orden?')) {
@@ -214,7 +363,8 @@ const OrdenesTrabajo = () => {
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={() => navigate(`/ordenes-trabajo/editar/${orden.id}`)}
+                      onClick={() => openEditModal(orden)}
+                      // onClick={() => navigate(`/ordenes-trabajo/editar/${orden.id}`)}
                       className="p-2 bg-gray-700 rounded-lg hover:bg-purple-600/30 text-purple-400 hover:text-purple-300 transition-all"
                       title="Editar"
                     >
@@ -390,6 +540,222 @@ const OrdenesTrabajo = () => {
           </motion.div>
         )}
       </AnimatePresence>
+                      {/* ✅ NUEVO MODAL DE EDICIÓN */}
+                <AnimatePresence>
+                  {showEditModal && editingOrden && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 p-4"
+                    >
+                      <motion.div
+                        initial={{ scale: 0.9, y: 20 }}
+                        animate={{ scale: 1, y: 0 }}
+                        exit={{ scale: 0.9, y: 20 }}
+                        className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl shadow-2xl border border-gray-700 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+                      >
+                        <div className="flex justify-between items-start mb-6">
+                          <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-purple-700 bg-clip-text text-transparent">
+                            Editar Orden #{editingOrden.id}
+                          </h3>
+                          <motion.button
+                            whileHover={{ rotate: 90, scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => setShowEditModal(false)}
+                            className="text-gray-400 hover:text-white text-xl"
+                          >
+                            ✕
+                          </motion.button>
+                        </div>
+                        
+                        <form onSubmit={handleSubmitEdit} className="space-y-6">
+                          {/* Información básica */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Título *
+                              </label>
+                              <input
+                                type="text"
+                                name="titulo"
+                                value={formData.titulo}
+                                onChange={handleFormChange}
+                                required
+                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 transition-colors"
+                                placeholder="Título de la orden"
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className="block text-sm font-medium text-gray-300 mb-2">
+                                Vehículo *
+                              </label>
+                              <input
+                                type="text"
+                                name="vehiculo"
+                                value={formData.vehiculo}
+                                onChange={handleFormChange}
+                                required
+                                className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 transition-colors"
+                                placeholder="Información del vehículo"
+                              />
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Descripción *
+                            </label>
+                            <textarea
+                              name="descripcion"
+                              value={formData.descripcion}
+                              onChange={handleFormChange}
+                              required
+                              rows={3}
+                              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 transition-colors"
+                              placeholder="Descripción del trabajo a realizar"
+                            />
+                          </div>
+                          
+                          <div>
+                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                              Cliente *
+                            </label>
+                            <select
+                              name="clienteId"
+                              value={formData.clienteId}
+                              onChange={handleFormChange}
+                              required
+                              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 transition-colors"
+                            >
+                              <option value="">Seleccionar cliente</option>
+                              {clientes.map(cliente => (
+                                <option key={cliente.id} value={cliente.id}>
+                                  {cliente.nombre} {cliente.apellido} - {cliente.cedula}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          
+                          {/* Materias Primas */}
+                          <div>
+                            <div className="flex justify-between items-center mb-4">
+                              <h4 className="text-lg font-semibold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
+                                Materias Primas
+                              </h4>
+                              <motion.button
+                                type="button"
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={agregarMateriaPrima}
+                                className="flex items-center gap-2 px-3 py-1 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors"
+                              >
+                                <FiPlus /> Agregar
+                              </motion.button>
+                            </div>
+                            
+                            <div className="space-y-3">
+                              {selectedMaterias.map((materia, index) => (
+                                <motion.div
+                                  key={index}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  className="flex gap-3 items-end bg-gray-800/50 p-3 rounded-lg border border-gray-600"
+                                >
+                                  <div className="flex-1">
+                                    <label className="block text-xs text-gray-400 mb-1">
+                                      Materia Prima
+                                    </label>
+                                    <select
+                                      value={materia.materiaPrimaId}
+                                      onChange={(e) => handleMateriaChange(index, 'materiaPrimaId', e.target.value)}
+                                      className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-purple-500"
+                                    >
+                                      <option value="">Seleccionar...</option>
+                                      {Array.isArray(materiasPrimas) && materiasPrimas.map(mp => (
+                                        <option key={mp.id} value={mp.id}>
+                                          {mp.nombre} ({mp.unidadMedida})
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                  
+                                  <div className="w-24">
+                                    <label className="block text-xs text-gray-400 mb-1">
+                                      Cantidad
+                                    </label>
+                                    <input
+                                      type="number"
+                                      value={materia.cantidad}
+                                      onChange={(e) => handleMateriaChange(index, 'cantidad', e.target.value)}
+                                      min="0"
+                                      step="0.1"
+                                      className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-purple-500"
+                                    />
+                                  </div>
+                                  
+                                  <motion.button
+                                    type="button"
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
+                                    onClick={() => eliminarMateriaPrima(index)}
+                                    className="p-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                  >
+                                    <FiX size={16} />
+                                  </motion.button>
+                                </motion.div>
+                              ))}
+                              
+                              {selectedMaterias.length === 0 && (
+                                <div className="text-center py-6 text-gray-400 border-2 border-dashed border-gray-600 rounded-lg">
+                                  No hay materias primas seleccionadas
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Botones */}
+                          <div className="flex justify-end gap-3 pt-6 border-t border-gray-700">
+                            <motion.button
+                              type="button"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => setShowEditModal(false)}
+                              className="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                            >
+                              Cancelar
+                            </motion.button>
+                            
+                            <motion.button
+                              type="submit"
+                              disabled={submitting}
+                              whileHover={{ scale: submitting ? 1 : 1.05 }}
+                              whileTap={{ scale: submitting ? 1 : 0.95 }}
+                              className="flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-800 text-white rounded-lg hover:from-purple-700 hover:to-purple-900 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {submitting ? (
+                                <>
+                                  <motion.div
+                                    animate={{ rotate: 360 }}
+                                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                                  />
+                                  Guardando...
+                                </>
+                              ) : (
+                                <>
+                                  <FiSave />
+                                  Guardar Cambios
+                                </>
+                              )}
+                            </motion.button>
+                          </div>
+                        </form>
+                      </motion.div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
     </div>
   )
 }
