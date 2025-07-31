@@ -1,21 +1,21 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
-import { FiHome, FiPackage, FiPlusCircle, FiTruck, FiChevronRight, FiChevronDown, FiChevronUp, FiClipboard, FiList, FiUsers, FiLogOut } from 'react-icons/fi'
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { FiFileText, FiHome, FiPackage, FiPlusCircle, FiTruck, FiChevronDown, FiChevronUp, FiClipboard, FiList, FiUsers, FiLogOut } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Dashboard = () => {
-  const [showMaterialSubmenu, setShowMaterialSubmenu] = useState(false)
-  const [showWorkOrderSubmenu, setShowWorkOrderSubmenu] = useState(false)
-  const [showClienteSubmenu, setShowClienteSubmenu] = useState(false)
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const location = useLocation()
+  const [showMaterialSubmenu, setShowMaterialSubmenu] = useState(false);
+  const [showWorkOrderSubmenu, setShowWorkOrderSubmenu] = useState(false);
+  const [showClienteSubmenu, setShowClienteSubmenu] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const location = useLocation();
 
   // Cerrar submenús cuando cambia la ruta
   useEffect(() => {
-    setShowMaterialSubmenu(false)
-    setShowWorkOrderSubmenu(false)
-    setShowClienteSubmenu(false)
-  }, [location.pathname])
+    setShowMaterialSubmenu(false);
+    setShowWorkOrderSubmenu(false);
+    setShowClienteSubmenu(false);
+  }, [location.pathname]);
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-gray-900 to-gray-800">
@@ -32,7 +32,6 @@ const Dashboard = () => {
             className="text-red-600"
           >
             <FiTruck size={24} />
-            {/* <FiChevronUp size={24} /> */}
           </motion.div>
           <motion.h1 
             initial={{ opacity: 1 }}
@@ -228,6 +227,23 @@ const Dashboard = () => {
                 )}
               </AnimatePresence>
             </li>
+
+            {/* Reportes (enlace simple) */}
+            <li>
+              <Link
+                to="reportes"
+                className="flex items-center gap-3 p-3 rounded-md text-gray-300 hover:bg-gradient-to-r hover:from-red-900/50 hover:to-red-800/50 hover:text-white transition-all group"
+              >
+                <FiFileText size={20} className="text-red-500 group-hover:text-white" />
+                <motion.span
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: isCollapsed ? 0 : 1 }}
+                  className="whitespace-nowrap"
+                >
+                  Reportes
+                </motion.span>
+              </Link>
+            </li>
           </ul>
         </nav>
 
@@ -272,7 +288,7 @@ const Dashboard = () => {
         </motion.div>
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

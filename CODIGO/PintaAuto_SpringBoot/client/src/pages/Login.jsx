@@ -72,7 +72,7 @@ const Login = () => {
           showError('Error en el inicio de sesión')
         }
       } else {
-        navigate('/dashboard')
+        navigate('/gestiones')
       }
     } catch (error) {
       console.error('Error en el inicio de sesión:', error)

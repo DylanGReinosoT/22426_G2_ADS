@@ -9,7 +9,8 @@ import OrdenesTrabajo from './pages/OrdenTrabajo'
 import OrdenTrabajoForm from './pages/RegistrarOrdenTrabajo'
 import Cliente from './pages/Cliente'
 import RegistrarCliente from './pages/RegistrarCliente'
-import Proximamente from './pages/Proximamente'
+import ReportesPDF from './pages/ReportesPDF'
+
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
         <Route path="cliente" element={<Cliente />} />
         <Route path="cliente/registrar" element={<RegistrarCliente />} />
         <Route path="crear" element={<OrdenTrabajoForm/>} />
-      <Route path="reportes" element={<Proximamente/>} />
+        <Route path="reportes" element={<ReportesPDF/>} />
       </Route>
     </Routes>
   )
