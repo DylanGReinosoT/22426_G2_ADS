@@ -64,26 +64,37 @@ public class ReporteService {
     public ReporteMaterias generarReportePorMateriaPrima(String nombreMateriaPrima) {
         // Consulta los datos necesarios
         List<OrdenTrabajo> resultados = ordenTrabajoRepository.obtenerDatosPorMateriaPrima(nombreMateriaPrima);
+        ItemsReporteMateriasDTO item = new ItemsReporteMateriasDTO();
 
-        // Transforma los resultados en DTOs
-        List<ItemsReporteMateriasDTO> items = resultados.stream()
-                .map(resultado -> new ItemsReporteMateriasDTO(
-                        (Cliente) resultado[0], // cliente
-                        (Usuario) resultado[1], // usuario
-                        (Date) resultado[2], // fechaUso
-                        (Double) resultado[3], // valorUnitario
-                        (Double) resultado[4] // cantidad
-                ))
-                .collect(Collectors.toList());
+        List<ItemsReporteMateriasDTO> listaItems = new ArrayList<>();
+        for (OrdenTrabajo orden: resultados){
+            Cliente cliente = orden.getCliente();
+            Usuario usuario = orden.getUsuario();
+            item.setFechaUso(orden.getFechaCreacion());
+            Map<MateriaPrima, Double> materiales = new HashMap<>();
+
+            for(MateriaPrima materia : orden.getMateriasPrimasYcantidades().keySet()){
+                if(materia.getNombre().equalsIgnoreCase(nombreMateriaPrima)){
+                    Double cantidad = orden.getMateriasPrimasYcantidades().get(materia);
+                    item.setValorUnitario(materia.getPrecioUnitario().doubleValue());
+                    item.setCantidad(cantidad);
+                    item.setValorTotal(item.getValorUnitario() * item.getCantidad());
+                    materiales.put(materia, cantidad);
+                }
+            }
+
+            listaItems.add(item);
+        }
+
 
         // Calcula el total de materiales
-        Double totalMateriales = items.stream()
+        Double totalMateriales = listaItems.stream()
                 .mapToDouble(ItemsReporteMateriasDTO::getValorTotal)
                 .sum();
 
         // Retorna el reporte
         ReporteMaterias reporte = new ReporteMaterias();
-        reporte.setOrdenes(items);
+        reporte.setOrdenes(listaItems);
         reporte.setTotalMateriales(totalMateriales);
         return reporte;
     }

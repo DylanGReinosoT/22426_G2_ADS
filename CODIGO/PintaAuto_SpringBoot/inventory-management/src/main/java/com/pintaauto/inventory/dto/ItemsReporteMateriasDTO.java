@@ -3,12 +3,13 @@ package com.pintaauto.inventory.dto;
 import com.pintaauto.inventory.entity.Cliente;
 import com.pintaauto.inventory.entity.Usuario;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class ItemsReporteMateriasDTO {
     private Cliente cliente;
     private Usuario usuario;
-    private Date fechaUso;
+    private LocalDateTime fechaUso;
     private Double valorUnitario;
     private Double cantidad;
     private Double valorTotal;
@@ -16,7 +17,7 @@ public class ItemsReporteMateriasDTO {
     public ItemsReporteMateriasDTO() {
         // Default constructor
     }
-    public ItemsReporteMateriasDTO(Cliente cliente, Usuario usuario, Date fechaUso, Double valorUnitario, Double cantidad) {
+    public ItemsReporteMateriasDTO(Cliente cliente, Usuario usuario, LocalDateTime fechaUso, Double valorUnitario, Double cantidad) {
         this.cliente = cliente;
         this.usuario = usuario;
         this.fechaUso = fechaUso;
@@ -41,11 +42,11 @@ public class ItemsReporteMateriasDTO {
         this.usuario = usuario;
     }
 
-    public Date getFechaUso() {
+    public LocalDateTime getFechaUso() {
         return fechaUso;
     }
 
-    public void setFechaUso(Date fechaUso) {
+    public void setFechaUso(LocalDateTime fechaUso) {
         this.fechaUso = fechaUso;
     }
 
