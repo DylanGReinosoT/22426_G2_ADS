@@ -97,6 +97,7 @@ public class OrdenTrabajoService{
         // Actualizar campos de la orden de trabajo
         ordenTrabajo.setTitulo(requestDTO.getTitulo());
         ordenTrabajo.setDescripcion(requestDTO.getDescripcion());
+        ordenTrabajo.setVehiculo(requestDTO.getVehiculo());
         // No actualizamos usuario ni materias primas, asumiendo que no cambian
 
         // Guardar la orden de trabajo actualizada

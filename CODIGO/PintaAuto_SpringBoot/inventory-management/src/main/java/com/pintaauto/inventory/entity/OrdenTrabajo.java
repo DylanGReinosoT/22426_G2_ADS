@@ -171,6 +171,10 @@ public class OrdenTrabajo {
         return cliente;
     }
 
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
     public Map<MateriaPrima, Double> getMateriasPrimasYcantidades() {
         return materiasPrimasYcantidades;
     }

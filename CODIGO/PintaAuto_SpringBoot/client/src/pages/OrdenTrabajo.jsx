@@ -690,7 +690,7 @@ const OrdenesTrabajo = () => {
                                       value={materia.cantidad}
                                       onChange={(e) => handleMateriaChange(index, 'cantidad', e.target.value)}
                                       min="0"
-                                      step="0.1"
+                                      step="1"
                                       className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-purple-500"
                                     />
                                   </div>
