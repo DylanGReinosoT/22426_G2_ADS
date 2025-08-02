@@ -35,4 +35,6 @@ public interface MateriaPrimaRepository extends JpaRepository<MateriaPrima, Long
     // Verificar si existe una materia prima con un nombre específico excluyendo un ID
     @Query("SELECT COUNT(m) > 0 FROM MateriaPrima m WHERE LOWER(m.nombre) = LOWER(:nombre) AND m.id != :id")
     boolean existsByNombreAndIdNot(@Param("nombre") String nombre, @Param("id") Long id);
+
+
 }

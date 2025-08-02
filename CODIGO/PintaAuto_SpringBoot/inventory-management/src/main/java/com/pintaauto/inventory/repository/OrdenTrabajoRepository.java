@@ -5,8 +5,10 @@ import com.pintaauto.inventory.entity.OrdenTrabajo;
 import com.pintaauto.inventory.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -27,5 +29,9 @@ public interface OrdenTrabajoRepository extends JpaRepository<OrdenTrabajo, Long
     @Query("SELECT c FROM Cliente c WHERE c.id = :clienteId")
     Cliente findClienteById(Long clienteId);
 
+    // Reportes
+    @Query("SELECT o FROM OrdenTrabajo o WHERE o.fechaCreacion BETWEEN :fechaInicio AND :fechaFin")
+    List<OrdenTrabajo> obtenerDatosPorRangosFechas(@Param("fechaInicio") Date fechaInicio,
+                                               @Param("fechaFin") Date fechaFin);
 
 }

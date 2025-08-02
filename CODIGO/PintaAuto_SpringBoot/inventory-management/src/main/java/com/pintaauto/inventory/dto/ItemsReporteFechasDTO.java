@@ -1,14 +1,14 @@
 package com.pintaauto.inventory.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
 public class ItemsReporteFechasDTO {
-    private Long idOrden;
+    private int idOrden;
     private String cliente;
     private String usuario;
-    private Date fechaCreacion;
-    private Date fechaFinalizacion;
+    private LocalDateTime fechaCreacion;
     private List<MateriaPrimaReporteDTO> materiales;
     private Double valorMateriales;
 
@@ -16,25 +16,23 @@ public class ItemsReporteFechasDTO {
     public ItemsReporteFechasDTO() {
         // Default constructor
     }
-    public ItemsReporteFechasDTO(Long idOrden,
+    public ItemsReporteFechasDTO(int idOrden,
                                  String cliente,
                                  String usuario,
-                                 Date fechaCreacion,
-                                 Date fechaFinalizacion,
+                                 LocalDateTime fechaCreacion,
                                  List<MateriaPrimaReporteDTO> materiales) {
         this.idOrden = idOrden;
         this.cliente = cliente;
         this.usuario = usuario;
         this.fechaCreacion = fechaCreacion;
-        this.fechaFinalizacion = fechaFinalizacion;
         this.materiales = materiales;
     }
 
-    public Long getIdOrden() {
+    public int getIdOrden() {
         return idOrden;
     }
 
-    public void setIdOrden(Long idOrden) {
+    public void setIdOrden(int idOrden) {
         this.idOrden = idOrden;
     }
 
@@ -54,21 +52,14 @@ public class ItemsReporteFechasDTO {
         this.usuario = usuario;
     }
 
-    public Date getFechaCreacion() {
+    public LocalDateTime getFechaCreacion() {
         return fechaCreacion;
     }
 
-    public void setFechaCreacion(Date fechaCreacion) {
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public Date getFechaFinalizacion() {
-        return fechaFinalizacion;
-    }
-
-    public void setFechaFinalizacion(Date fechaFinalizacion) {
-        this.fechaFinalizacion = fechaFinalizacion;
-    }
 
     public List<MateriaPrimaReporteDTO> getMateriales() {
         return materiales;

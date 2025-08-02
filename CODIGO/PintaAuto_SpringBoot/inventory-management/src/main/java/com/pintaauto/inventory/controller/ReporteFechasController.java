@@ -1,0 +1,26 @@
+package com.pintaauto.inventory.controller;
+
+import com.pintaauto.inventory.entity.ReporteFechas;
+import com.pintaauto.inventory.service.ReporteService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+
+@RestController
+@RequestMapping("/api/reportes/fechas")
+public class ReporteFechasController {
+
+    @Autowired
+    private ReporteService reporteService;
+
+    @GetMapping
+    public ResponseEntity<ReporteFechas> generarReportePorFechas(
+            @RequestParam("fechaInicio") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaInicio,
+            @RequestParam("fechaFin") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaFin) {
+        ReporteFechas reporte = reporteService.generarReportePorFechas(fechaInicio, fechaFin);
+        return ResponseEntity.ok(reporte);
+    }
+}
