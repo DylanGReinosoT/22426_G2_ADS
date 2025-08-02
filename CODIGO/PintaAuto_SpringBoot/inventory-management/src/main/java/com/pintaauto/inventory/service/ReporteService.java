@@ -63,7 +63,7 @@ public class ReporteService {
 
     public ReporteMaterias generarReportePorMateriaPrima(String nombreMateriaPrima) {
         // Consulta los datos necesarios
-        List<Object[]> resultados = materiaPrimaRepository.obtenerDatosPorMateriaPrima(nombreMateriaPrima);
+        List<OrdenTrabajo> resultados = ordenTrabajoRepository.obtenerDatosPorMateriaPrima(nombreMateriaPrima);
 
         // Transforma los resultados en DTOs
         List<ItemsReporteMateriasDTO> items = resultados.stream()

@@ -17,7 +17,7 @@ public class MateriaPrima {
 
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(min = 3, max = 80, message = "El nombre no puede exceder los 80 caracteres")
-    @Column(nullable = false, length = 80)
+    @Column(nullable = false, length = 80, unique = true)
     private String nombre;
 
     @NotBlank(message = "La descripción no puede estar vacía")

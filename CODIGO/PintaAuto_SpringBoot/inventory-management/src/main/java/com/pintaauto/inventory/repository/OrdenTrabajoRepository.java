@@ -35,4 +35,6 @@ public interface OrdenTrabajoRepository extends JpaRepository<OrdenTrabajo, Long
     List<OrdenTrabajo> obtenerDatosPorRangosFechas(@Param("fechaInicio") LocalDateTime fechaInicio,
                                                @Param("fechaFin") LocalDateTime fechaFin);
 
+    @Query("SELECT o FROM OrdenTrabajo o JOIN o.materiasPrimasYcantidades mp WHERE KEY(mp).nombre = :nombreMateriaPrima")
+    List<OrdenTrabajo> obtenerDatosPorMateriaPrima(@Param("nombreMateriaPrima") String nombreMateriaPrima);
 }
