@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,7 @@ public class ReporteService {
     @Autowired
     private OrdenTrabajoRepository ordenTrabajoRepository;
 
-    public ReporteFechas generarReportePorFechas(Date fechaInicio, Date fechaFin) {
+    public ReporteFechas generarReportePorFechas(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
         // Consulta los datos necesarios
         List<OrdenTrabajo> resultados = ordenTrabajoRepository.obtenerDatosPorRangosFechas(fechaInicio, fechaFin);
 

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public interface OrdenTrabajoRepository extends JpaRepository<OrdenTrabajo, Long
 
     // Reportes
     @Query("SELECT o FROM OrdenTrabajo o WHERE o.fechaCreacion BETWEEN :fechaInicio AND :fechaFin")
-    List<OrdenTrabajo> obtenerDatosPorRangosFechas(@Param("fechaInicio") Date fechaInicio,
-                                               @Param("fechaFin") Date fechaFin);
+    List<OrdenTrabajo> obtenerDatosPorRangosFechas(@Param("fechaInicio") LocalDateTime fechaInicio,
+                                               @Param("fechaFin") LocalDateTime fechaFin);
 
 }

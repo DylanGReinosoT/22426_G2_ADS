@@ -7,6 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @RestController
@@ -18,8 +19,8 @@ public class ReporteFechasController {
 
     @GetMapping
     public ResponseEntity<ReporteFechas> generarReportePorFechas(
-            @RequestParam("fechaInicio") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaInicio,
-            @RequestParam("fechaFin") @DateTimeFormat(pattern = "yyyy-MM-dd") Date fechaFin) {
+            @RequestParam("fechaInicio") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime fechaInicio,
+            @RequestParam("fechaFin") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDateTime fechaFin) {
         ReporteFechas reporte = reporteService.generarReportePorFechas(fechaInicio, fechaFin);
         return ResponseEntity.ok(reporte);
     }
