@@ -61,30 +61,30 @@ public class ReporteService {
         return reporte;
     }
 
-//    public ReporteMaterias generarReportePorMateriaPrima(String nombreMateriaPrima) {
-//        // Consulta los datos necesarios
-//        List<Object[]> resultados = materiaPrimaRepository.obtenerDatosPorMateriaPrima(nombreMateriaPrima);
-//
-//        // Transforma los resultados en DTOs
-//        List<ItemsReporteMateriasDTO> items = resultados.stream()
-//                .map(resultado -> new ItemsReporteMateriasDTO(
-//                        (Cliente) resultado[0], // cliente
-//                        (Usuario) resultado[1], // usuario
-//                        (Date) resultado[2], // fechaUso
-//                        (Double) resultado[3], // valorUnitario
-//                        (Double) resultado[4] // cantidad
-//                ))
-//                .collect(Collectors.toList());
-//
-//        // Calcula el total de materiales
-//        Double totalMateriales = items.stream()
-//                .mapToDouble(ItemsReporteMateriasDTO::getValorTotal)
-//                .sum();
-//
-//        // Retorna el reporte
-//        ReporteMaterias reporte = new ReporteMaterias();
-//        reporte.setOrdenes(items);
-//        reporte.setTotalMateriales(totalMateriales);
-//        return reporte;
-//    }
+    public ReporteMaterias generarReportePorMateriaPrima(String nombreMateriaPrima) {
+        // Consulta los datos necesarios
+        List<Object[]> resultados = materiaPrimaRepository.obtenerDatosPorMateriaPrima(nombreMateriaPrima);
+
+        // Transforma los resultados en DTOs
+        List<ItemsReporteMateriasDTO> items = resultados.stream()
+                .map(resultado -> new ItemsReporteMateriasDTO(
+                        (Cliente) resultado[0], // cliente
+                        (Usuario) resultado[1], // usuario
+                        (Date) resultado[2], // fechaUso
+                        (Double) resultado[3], // valorUnitario
+                        (Double) resultado[4] // cantidad
+                ))
+                .collect(Collectors.toList());
+
+        // Calcula el total de materiales
+        Double totalMateriales = items.stream()
+                .mapToDouble(ItemsReporteMateriasDTO::getValorTotal)
+                .sum();
+
+        // Retorna el reporte
+        ReporteMaterias reporte = new ReporteMaterias();
+        reporte.setOrdenes(items);
+        reporte.setTotalMateriales(totalMateriales);
+        return reporte;
+    }
 }

@@ -8,11 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @RestController
 @RequestMapping("/api/reportes/fechas")
-public class ReporteFechasController {
+public class ReporteController {
 
     @Autowired
     private ReporteService reporteService;
