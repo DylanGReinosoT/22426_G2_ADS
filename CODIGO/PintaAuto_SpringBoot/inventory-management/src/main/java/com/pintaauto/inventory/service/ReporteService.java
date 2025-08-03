@@ -74,24 +74,23 @@ public class ReporteService {
         for (OrdenTrabajo orden : resultados) {
             ItemsReporteMateriasDTO item = new ItemsReporteMateriasDTO();
             Map<MateriaPrima, Double> materiales = orden.getMateriasPrimasYcantidades();
+
+            Cliente cliente = orden.getCliente();
+            Usuario usuario = orden.getUsuario();
+            item.setCliente(cliente.getNombre() + " " + cliente.getApellido());
+            item.setUsuario(usuario.getNombre());
+            item.setFechaUso(orden.getFechaCreacion());
+
             for (MateriaPrima materia : materiales.keySet()) {
                 if (materia.getNombre().equalsIgnoreCase(nombreMateriaPrima)) {
-
-                    Cliente cliente = orden.getCliente();
-                    Usuario usuario = orden.getUsuario();
-                    item.setCliente(cliente.getNombre() + " " + cliente.getApellido());
-                    item.setUsuario(usuario.getNombre());
-                    item.setFechaUso(orden.getFechaCreacion());
                     Double cantidad = materiales.get(materia);
                     item.setValorUnitario(materia.getPrecioUnitario().doubleValue());
                     item.setCantidad(cantidad);
                     item.setValorTotal(item.getValorUnitario() * item.getCantidad());
-
                 }
             }
             listaItems.add(item);
         }
-
 
         // Calcula el total de materiales
         Double totalMateriales = listaItems.stream()
