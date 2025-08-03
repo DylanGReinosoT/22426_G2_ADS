@@ -47,4 +47,14 @@ public class ReporteController {
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(pdfBytes);
     }
+
+    @GetMapping("/materia/pdf")
+    public ResponseEntity<byte[]> generarPdfMateria(@RequestBody ReporteMaterias reporteMaterias) throws Exception {
+        byte[] pdfBytes = reporteService.generarReporteMateriasPdf(reporteMaterias);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=ReporteMateria.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdfBytes);
+    }
 }
