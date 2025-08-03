@@ -14,8 +14,9 @@ public class ReporteMaterias {
     public ReporteMaterias() {
         // Default constructor
     }
-    public ReporteMaterias(int id, List<ItemsReporteMateriasDTO> ordenes, Double totalMateriales) {
+    public ReporteMaterias(int id, String nombreMateria, List<ItemsReporteMateriasDTO> ordenes, Double totalMateriales) {
         this.id = id;
+        this.nombreMateria = nombreMateria;
         this.ordenes = ordenes;
         this.totalMateriales = totalMateriales;
     }

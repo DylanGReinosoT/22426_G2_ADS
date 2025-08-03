@@ -48,7 +48,7 @@ public class ReporteController {
                 .body(pdfBytes);
     }
 
-    @GetMapping("/materia/pdf")
+    @PostMapping("/materia/pdf")
     public ResponseEntity<byte[]> generarPdfMateria(@RequestBody ReporteMaterias reporteMaterias) throws Exception {
         byte[] pdfBytes = reporteService.generarReporteMateriasPdf(reporteMaterias);
 
