@@ -112,6 +112,7 @@ public class ReporteService {
 
         // Retorna el reporte
         ReporteMaterias reporte = new ReporteMaterias();
+        reporte.setNombreMateria(nombreMateriaPrima);
         reporte.setOrdenes(listaItems);
         reporte.setTotalMateriales(totalMateriales);
         return reporte;
@@ -169,6 +170,60 @@ public class ReporteService {
 
         // Total general
         document.add(new Paragraph("TOTAL GENERAL DE MATERIALES: $" + reporte.getTotalMateriales(), new Font(Font.HELVETICA, 14, Font.BOLD)));
+
+        document.close();
+        return baos.toByteArray();
+    }
+
+    public byte[] generarReporteMateriasPdf(ReporteMaterias reporte) throws DocumentException {
+        Document document = new Document(PageSize.A4);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PdfWriter.getInstance(document, baos);
+        String titulo = "Reporte por Materia Prima: " + reporte.getNombreMateria();
+
+        document.open();
+
+        // Título del documento
+        Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
+        Paragraph title = new Paragraph(titulo, titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+        document.add(new Paragraph(" ")); // Espacio
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+        for (ItemsReporteMateriasDTO orden : reporte.getOrdenes()) {
+            document.add(new Paragraph("Cliente: " + orden.getCliente()));
+            document.add(new Paragraph("Usuario: " + orden.getUsuario()));
+            document.add(new Paragraph(" "));
+
+            // Tabla de materiales
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(100);
+            table.setSpacingBefore(10f);
+            table.setSpacingAfter(10f);
+
+            // Cabecera
+            Stream.of("Valor Unitario", "Cantidad", "Valor Total")
+                    .forEach(header -> {
+                        PdfPCell cell = new PdfPCell(new Phrase(header));
+                        cell.setBackgroundColor(Color.LIGHT_GRAY);
+                        table.addCell(cell);
+                    });
+
+            // Filas
+
+            table.addCell(orden.getValorUnitario().toString());
+            table.addCell("$" + orden.getCantidad().toString());
+            table.addCell("$" + orden.getValorTotal().toString());
+
+
+            document.add(table);
+            document.add(new Paragraph("------------------------------------------------------"));
+        }
+
+        // Total general
+        document.add(new Paragraph("TOTAL GENERADO: $" + reporte.getTotalMateriales(), new Font(Font.HELVETICA, 14, Font.BOLD)));
 
         document.close();
         return baos.toByteArray();

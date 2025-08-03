@@ -7,6 +7,7 @@ import java.util.List;
 
 public class ReporteMaterias {
     private int id;
+    private String nombreMateria;
     private List<ItemsReporteMateriasDTO> ordenes;
     private Double totalMateriales;
 
@@ -25,6 +26,14 @@ public class ReporteMaterias {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getNombreMateria() {
+        return nombreMateria;
+    }
+
+    public void setNombreMateria(String nombreMateria) {
+        this.nombreMateria = nombreMateria;
     }
 
     public List<ItemsReporteMateriasDTO> getOrdenes() {
