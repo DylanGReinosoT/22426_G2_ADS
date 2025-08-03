@@ -48,6 +48,9 @@ public class ReporteService {
                 listaMateriasAux.add(materiaDTO);
             }
             item.setMateriales(listaMateriasAux);
+            item.setValorMateriales(listaMateriasAux.stream()
+                    .mapToDouble(MateriaPrimaReporteDTO::getValorTotal)
+                    .sum());
             listaItems.add(item);
         }
         // Calcular el total de materiales
