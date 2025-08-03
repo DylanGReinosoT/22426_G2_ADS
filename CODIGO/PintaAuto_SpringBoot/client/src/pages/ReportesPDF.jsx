@@ -81,10 +81,6 @@ const Reportes = () => {
         datos = await reporteService.obtenerDatosReporteMaterias(materiaPrima || null);
       }
       
-      console.log('Datos recibidos del backend:', datos);
-      console.log('Tipo de datos:', typeof datos);
-      console.log('Es array:', Array.isArray(datos));
-      
       setPreviewData(datos);
       setShowPreview(true);
       showNotification('success', 'Vista previa generada correctamente');
@@ -517,59 +513,101 @@ const Reportes = () => {
 
 // Componente para vista previa de reportes por fechas
 const ReportesPorFechas = ({ data }) => {
-  if (!data || !data.reportesPorCliente) {
-    return <div className="text-gray-400">No hay datos disponibles</div>;
+  console.log('Datos en ReportesPorFechas:', data);
+  
+  if (!data || !data.ordenes || data.ordenes.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-gray-400 text-lg">No se encontraron órdenes para el período seleccionado</div>
+      </div>
+    );
   }
+
+  // Función para formatear fecha
+  const formatearFecha = (fechaISO) => {
+    const fecha = new Date(fechaISO);
+    return fecha.toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
     <div className="space-y-6">
+      {/* Resumen general */}
       <div className="bg-gray-700 p-4 rounded-lg">
         <h3 className="text-lg font-semibold text-white mb-2">
-          Período: {data.fechaInicio} - {data.fechaFin}
+          Resumen del Reporte por Fechas
         </h3>
-        <p className="text-gray-300">
-          Total de órdenes encontradas: <span className="font-bold text-red-400">{data.totalOrdenes}</span>
-        </p>
+        <div className="flex justify-between items-center">
+          <p className="text-gray-300">
+            Total de órdenes encontradas: <span className="font-bold text-blue-400">{data.ordenes.length}</span>
+          </p>
+          <p className="text-gray-300">
+            Total materiales: <span className="font-bold text-green-400">${data.totalMateriales.toFixed(2)}</span>
+          </p>
+        </div>
       </div>
 
+      {/* Lista de órdenes */}
       <div className="space-y-4">
-        <h4 className="text-xl font-bold text-white">Reportes por Cliente</h4>
-        {data.reportesPorCliente.map((reporte, index) => (
-          <div key={index} className="bg-gray-700 p-4 rounded-lg">
+        <h4 className="text-xl font-bold text-white">Órdenes de Trabajo</h4>
+        {data.ordenes.map((orden, index) => (
+          <div key={index} className="bg-gray-700 p-4 rounded-lg border-l-4 border-red-500">
+            {/* Encabezado de la orden */}
             <div className="flex justify-between items-start mb-3">
               <div>
                 <h5 className="font-semibold text-lg text-white">
-                  {reporte.cliente.nombre} {reporte.cliente.apellido}
+                  {orden.cliente}
                 </h5>
-                <p className="text-gray-400 text-sm">Cédula: {reporte.cliente.cedula}</p>
+                <p className="text-gray-400 text-sm">
+                  Usuario: {orden.usuario} | Fecha: {formatearFecha(orden.fechaCreacion)}
+                </p>
               </div>
               <div className="text-right">
-                <p className="text-gray-300">Total Materiales:</p>
-                <p className="font-bold text-red-400 text-lg">${reporte.totalMateriales}</p>
+                <p className="text-gray-300 text-sm">Total Orden:</p>
+                <p className="font-bold text-green-400 text-lg">${orden.valorMateriales.toFixed(2)}</p>
               </div>
             </div>
             
+            {/* Materiales de la orden */}
             <div className="space-y-2">
-              <h6 className="font-medium text-gray-300">Materiales utilizados:</h6>
-              {reporte.materiales.map((material, idx) => (
-                <div key={idx} className="flex justify-between items-center bg-gray-800 p-2 rounded">
-                  <span className="text-white">{material.nombre}</span>
-                  <div className="text-right">
-                    <span className="text-gray-300">Cantidad: {material.cantidad}</span>
-                    <br />
-                    <span className="text-green-400 font-medium">${material.subtotal}</span>
+              <h6 className="font-medium text-gray-300 mb-2">Materiales utilizados:</h6>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {orden.materiales.map((material, idx) => (
+                  <div key={idx} className="flex justify-between items-center bg-gray-800 p-3 rounded">
+                    <div>
+                      <span className="text-white font-medium">{material.nombre}</span>
+                      <br />
+                      <span className="text-gray-400 text-sm">
+                        Cantidad: {material.cantidad} | Precio unit.: ${material.precioUnitario.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-green-400 font-bold">${material.valorTotal.toFixed(2)}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-red-900 bg-opacity-30 p-4 rounded-lg border border-red-500">
-        <h4 className="text-xl font-bold text-white text-center">
-          Total General: <span className="text-red-400">${data.totalGeneral}</span>
-        </h4>
+      {/* Total general */}
+      <div className="bg-red-900 bg-opacity-30 p-6 rounded-lg border border-red-500">
+        <div className="text-center">
+          <h4 className="text-2xl font-bold text-white mb-2">
+            Total General del Período
+          </h4>
+          <p className="text-3xl font-bold text-red-400">${data.totalMateriales.toFixed(2)}</p>
+          <p className="text-gray-300 mt-2">
+            {data.ordenes.length} {data.ordenes.length === 1 ? 'orden procesada' : 'órdenes procesadas'}
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -577,65 +615,31 @@ const ReportesPorFechas = ({ data }) => {
 
 // Componente para vista previa de reportes por materias
 const ReportesPorMaterias = ({ data }) => {
-  if (!data || !data.reportesPorMateria) {
-    return <div className="text-gray-400">No hay datos disponibles</div>;
+  console.log('Datos en ReportesPorMaterias:', data);
+  
+  if (!data) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-gray-400 text-lg">No hay datos disponibles</div>
+      </div>
+    );
   }
 
+  // Si los datos tienen la misma estructura que fechas, adaptamos
+  if (data.ordenes && Array.isArray(data.ordenes)) {
+    return <ReportesPorFechas data={data} />;
+  }
+
+  // Fallback: mostrar estructura para debug
   return (
     <div className="space-y-6">
       <div className="bg-gray-700 p-4 rounded-lg">
         <h3 className="text-lg font-semibold text-white mb-2">
-          {data.materiaPrimaFiltro ? `Materia Prima: ${data.materiaPrimaFiltro}` : 'Todas las Materias Primas'}
+          Estructura de datos recibida (Reporte por Materias):
         </h3>
-        <p className="text-gray-300">
-          Total de órdenes encontradas: <span className="font-bold text-red-400">{data.totalOrdenes}</span>
-        </p>
-      </div>
-
-      <div className="space-y-4">
-        <h4 className="text-xl font-bold text-white">Reportes por Materia Prima</h4>
-        {data.reportesPorMateria.map((reporte, index) => (
-          <div key={index} className="bg-gray-700 p-4 rounded-lg">
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h5 className="font-semibold text-lg text-white">{reporte.materiaPrima.nombre}</h5>
-                <p className="text-gray-400 text-sm">Código: {reporte.materiaPrima.codigo}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-gray-300">Total Utilizado:</p>
-                <p className="font-bold text-red-400 text-lg">{reporte.cantidadTotal} {reporte.materiaPrima.unidadMedida}</p>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <h6 className="font-medium text-gray-300">Órdenes que utilizaron este material:</h6>
-              {reporte.ordenes.map((orden, idx) => (
-                <div key={idx} className="flex justify-between items-center bg-gray-800 p-2 rounded">
-                  <div>
-                    <span className="text-white">Orden #{orden.numeroOrden}</span>
-                    <br />
-                    <span className="text-gray-400 text-sm">
-                      Cliente: {orden.cliente.nombre} {orden.cliente.apellido}
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-gray-300">Fecha: {orden.fecha}</span>
-                    <br />
-                    <span className="text-green-400 font-medium">
-                      Cantidad: {orden.cantidadUtilizada} {reporte.materiaPrima.unidadMedida}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="bg-red-900 bg-opacity-30 p-4 rounded-lg border border-red-500">
-        <h4 className="text-xl font-bold text-white text-center">
-          Total de Materiales Utilizados: <span className="text-red-400">{data.totalMaterialesUtilizados}</span>
-        </h4>
+        <pre className="text-sm text-gray-300 bg-gray-800 p-3 rounded overflow-x-auto">
+          {JSON.stringify(data, null, 2)}
+        </pre>
       </div>
     </div>
   );
