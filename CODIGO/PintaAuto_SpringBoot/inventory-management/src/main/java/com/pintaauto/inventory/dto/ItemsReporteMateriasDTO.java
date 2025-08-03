@@ -7,8 +7,8 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 public class ItemsReporteMateriasDTO {
-    private Cliente cliente;
-    private Usuario usuario;
+    private String cliente;
+    private String usuario;
     private LocalDateTime fechaUso;
     private Double valorUnitario;
     private Double cantidad;
@@ -17,7 +17,7 @@ public class ItemsReporteMateriasDTO {
     public ItemsReporteMateriasDTO() {
         // Default constructor
     }
-    public ItemsReporteMateriasDTO(Cliente cliente, Usuario usuario, LocalDateTime fechaUso, Double valorUnitario, Double cantidad) {
+    public ItemsReporteMateriasDTO(String cliente, String usuario, LocalDateTime fechaUso, Double valorUnitario, Double cantidad) {
         this.cliente = cliente;
         this.usuario = usuario;
         this.fechaUso = fechaUso;
@@ -26,19 +26,19 @@ public class ItemsReporteMateriasDTO {
         this.valorTotal = valorUnitario * cantidad;
     }
 
-    public Cliente getCliente() {
+    public String getCliente() {
         return cliente;
     }
 
-    public void setCliente(Cliente cliente) {
+    public void setCliente(String cliente) {
         this.cliente = cliente;
     }
 
-    public Usuario getUsuario() {
+    public String getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(String usuario) {
         this.usuario = usuario;
     }
 

@@ -74,8 +74,10 @@ public class ReporteService {
         for (OrdenTrabajo orden: resultados){
             Cliente cliente = orden.getCliente();
             Usuario usuario = orden.getUsuario();
+            item.setCliente(cliente.getNombre() + " " + cliente.getApellido());
+            item.setUsuario(usuario.getNombre());
             item.setFechaUso(orden.getFechaCreacion());
-            Map<MateriaPrima, Double> materiales = new HashMap<>();
+            Map<MateriaPrima, Double> materiales = orden.getMateriasPrimasYcantidades();
 
             for(MateriaPrima materia : orden.getMateriasPrimasYcantidades().keySet()){
                 if(materia.getNombre().equalsIgnoreCase(nombreMateriaPrima)){
@@ -86,7 +88,6 @@ public class ReporteService {
                     materiales.put(materia, cantidad);
                 }
             }
-            materiales.clear();
 
             listaItems.add(item);
         }
