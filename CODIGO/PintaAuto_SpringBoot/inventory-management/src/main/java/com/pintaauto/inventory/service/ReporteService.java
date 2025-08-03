@@ -30,7 +30,7 @@ public class ReporteService {
             ItemsReporteFechasDTO item = new ItemsReporteFechasDTO();
             Cliente cliente = orden.getCliente();
             Usuario usuario = orden.getUsuario();
-            Map<MateriaPrima, Double> materiales = new HashMap<>();
+            Map<MateriaPrima, Double> materiales = orden.getMateriasPrimasYcantidades();
 
 
             item.setCliente(cliente.getNombre() + " " + cliente.getApellido());
