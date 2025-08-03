@@ -26,17 +26,17 @@ public class ReporteService {
 
         List<MateriaPrimaReporteDTO> listaMaterias = new ArrayList<>();
         List<ItemsReporteFechasDTO> listaItems = new ArrayList<>();
-        for(OrdenTrabajo orden : resultados){
+        for(OrdenTrabajo orden : resultados) {
+            List<MateriaPrimaReporteDTO> listaMateriasAux = new ArrayList<>();
             ItemsReporteFechasDTO item = new ItemsReporteFechasDTO();
             Cliente cliente = orden.getCliente();
             Usuario usuario = orden.getUsuario();
             Map<MateriaPrima, Double> materiales = orden.getMateriasPrimasYcantidades();
 
-
             item.setCliente(cliente.getNombre() + " " + cliente.getApellido());
             item.setUsuario(usuario.getNombre());
             item.setFechaCreacion(orden.getFechaCreacion());
-            for(Map.Entry<MateriaPrima, Double> entry : materiales.entrySet()){
+            for (Map.Entry<MateriaPrima, Double> entry : materiales.entrySet()) {
                 MateriaPrima materia = entry.getKey();
                 Double cantidad = entry.getValue();
                 MateriaPrimaReporteDTO materiaDTO = new MateriaPrimaReporteDTO(
@@ -45,8 +45,9 @@ public class ReporteService {
                         materia.getPrecioUnitario().doubleValue()
                 );
                 listaMaterias.add(materiaDTO);
+                listaMateriasAux.add(materiaDTO);
             }
-            item.setMateriales(listaMaterias);
+            item.setMateriales(listaMateriasAux);
             listaItems.add(item);
         }
         // Calcular el total de materiales
@@ -82,6 +83,7 @@ public class ReporteService {
                     materiales.put(materia, cantidad);
                 }
             }
+            materiales.clear();
 
             listaItems.add(item);
         }
