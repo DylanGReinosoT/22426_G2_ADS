@@ -68,27 +68,27 @@ public class ReporteService {
     public ReporteMaterias generarReportePorMateriaPrima(String nombreMateriaPrima) {
         // Consulta los datos necesarios
         List<OrdenTrabajo> resultados = ordenTrabajoRepository.obtenerDatosPorMateriaPrima(nombreMateriaPrima);
-        ItemsReporteMateriasDTO item = new ItemsReporteMateriasDTO();
+
 
         List<ItemsReporteMateriasDTO> listaItems = new ArrayList<>();
-        for (OrdenTrabajo orden: resultados){
-            Cliente cliente = orden.getCliente();
-            Usuario usuario = orden.getUsuario();
-            item.setCliente(cliente.getNombre() + " " + cliente.getApellido());
-            item.setUsuario(usuario.getNombre());
-            item.setFechaUso(orden.getFechaCreacion());
+        for (OrdenTrabajo orden : resultados) {
+            ItemsReporteMateriasDTO item = new ItemsReporteMateriasDTO();
             Map<MateriaPrima, Double> materiales = orden.getMateriasPrimasYcantidades();
+            for (MateriaPrima materia : materiales.keySet()) {
+                if (materia.getNombre().equalsIgnoreCase(nombreMateriaPrima)) {
 
-            for(MateriaPrima materia : orden.getMateriasPrimasYcantidades().keySet()){
-                if(materia.getNombre().equalsIgnoreCase(nombreMateriaPrima)){
-                    Double cantidad = orden.getMateriasPrimasYcantidades().get(materia);
+                    Cliente cliente = orden.getCliente();
+                    Usuario usuario = orden.getUsuario();
+                    item.setCliente(cliente.getNombre() + " " + cliente.getApellido());
+                    item.setUsuario(usuario.getNombre());
+                    item.setFechaUso(orden.getFechaCreacion());
+                    Double cantidad = materiales.get(materia);
                     item.setValorUnitario(materia.getPrecioUnitario().doubleValue());
                     item.setCantidad(cantidad);
                     item.setValorTotal(item.getValorUnitario() * item.getCantidad());
-                    materiales.put(materia, cantidad);
+
                 }
             }
-
             listaItems.add(item);
         }
 
