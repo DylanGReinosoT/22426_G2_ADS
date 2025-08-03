@@ -1,5 +1,10 @@
 package com.pintaauto.inventory.service;
 
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import com.pintaauto.inventory.dto.ItemsReporteFechasDTO;
 import com.pintaauto.inventory.dto.ItemsReporteMateriasDTO;
 import com.pintaauto.inventory.dto.MateriaPrimaReporteDTO;
@@ -9,10 +14,15 @@ import com.pintaauto.inventory.repository.OrdenTrabajoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class ReporteService {
@@ -102,5 +112,62 @@ public class ReporteService {
         reporte.setOrdenes(listaItems);
         reporte.setTotalMateriales(totalMateriales);
         return reporte;
+    }
+
+    public byte[] generarReporteFechasPdf(ReporteFechas reporte) throws DocumentException {
+        Document document = new Document(PageSize.A4);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PdfWriter.getInstance(document, baos);
+
+        document.open();
+
+        // Título del documento
+        Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
+        Paragraph title = new Paragraph("Reporte por Rango de Fechas", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+        document.add(new Paragraph(" ")); // Espacio
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
+
+        for (ItemsReporteFechasDTO orden : reporte.getOrdenes()) {
+            document.add(new Paragraph("Orden ID: " + orden.getIdOrden()));
+            document.add(new Paragraph("Cliente: " + orden.getCliente()));
+            document.add(new Paragraph("Usuario: " + orden.getUsuario()));
+            document.add(new Paragraph("Fecha de creación: " + orden.getFechaCreacion().format(formatter)));
+            document.add(new Paragraph(" "));
+
+            // Tabla de materiales
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(100);
+            table.setSpacingBefore(10f);
+            table.setSpacingAfter(10f);
+
+            // Cabecera
+            Stream.of("Nombre", "Cantidad", "Precio Unitario", "Valor Total")
+                    .forEach(header -> {
+                        PdfPCell cell = new PdfPCell(new Phrase(header));
+                        cell.setBackgroundColor(Color.LIGHT_GRAY);
+                        table.addCell(cell);
+                    });
+
+            // Filas
+            for (MateriaPrimaReporteDTO m : orden.getMateriales()) {
+                table.addCell(m.getNombre());
+                table.addCell(m.getCantidad().toString());
+                table.addCell("$" + m.getPrecioUnitario().toString());
+                table.addCell("$" + m.getValorTotal().toString());
+            }
+
+            document.add(table);
+            document.add(new Paragraph("Total materiales: $" + orden.getValorMateriales()));
+            document.add(new Paragraph("------------------------------------------------------"));
+        }
+
+        // Total general
+        document.add(new Paragraph("TOTAL GENERAL DE MATERIALES: $" + reporte.getTotalMateriales(), new Font(Font.HELVETICA, 14, Font.BOLD)));
+
+        document.close();
+        return baos.toByteArray();
     }
 }
