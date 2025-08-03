@@ -198,7 +198,7 @@ public class ReporteService {
             document.add(new Paragraph(" "));
 
             // Tabla de materiales
-            PdfPTable table = new PdfPTable(4);
+            PdfPTable table = new PdfPTable(3);
             table.setWidthPercentage(100);
             table.setSpacingBefore(10f);
             table.setSpacingAfter(10f);
@@ -212,7 +212,6 @@ public class ReporteService {
                     });
 
             // Filas
-
             table.addCell(orden.getValorUnitario().toString());
             table.addCell("$" + orden.getCantidad().toString());
             table.addCell("$" + orden.getValorTotal().toString());
