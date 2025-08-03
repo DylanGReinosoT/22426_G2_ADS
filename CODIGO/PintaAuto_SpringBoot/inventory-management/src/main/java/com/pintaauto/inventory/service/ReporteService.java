@@ -36,6 +36,7 @@ public class ReporteService {
 
         List<MateriaPrimaReporteDTO> listaMaterias = new ArrayList<>();
         List<ItemsReporteFechasDTO> listaItems = new ArrayList<>();
+        int numId = 1;
         for(OrdenTrabajo orden : resultados) {
             List<MateriaPrimaReporteDTO> listaMateriasAux = new ArrayList<>();
             ItemsReporteFechasDTO item = new ItemsReporteFechasDTO();
@@ -43,6 +44,7 @@ public class ReporteService {
             Usuario usuario = orden.getUsuario();
             Map<MateriaPrima, Double> materiales = orden.getMateriasPrimasYcantidades();
 
+            item.setIdOrden(numId);
             item.setCliente(cliente.getNombre() + " " + cliente.getApellido());
             item.setUsuario(usuario.getNombre());
             item.setFechaCreacion(orden.getFechaCreacion());
@@ -62,6 +64,7 @@ public class ReporteService {
                     .mapToDouble(MateriaPrimaReporteDTO::getValorTotal)
                     .sum());
             listaItems.add(item);
+            numId++;
         }
         // Calcular el total de materiales
         double sumaTotal = listaMaterias.stream()
