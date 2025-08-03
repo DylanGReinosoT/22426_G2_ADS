@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiDownload, FiArrowLeft, FiCalendar, FiBox, FiEye, FiAlertCircle, FiCheckCircle, FiX, FiFileText } from 'react-icons/fi';
 import reporteService from '../services/reporteService';
+import materiaprimaService from '../services/materiaprimaService';
 
 const Reportes = () => {
   const navigate = useNavigate();
@@ -10,10 +11,32 @@ const Reportes = () => {
   const [fechaInicio, setFechaInicio] = useState('');
   const [fechaFin, setFechaFin] = useState('');
   const [materiaPrima, setMateriaPrima] = useState('');
+  const [materiasPrimas, setMateriasPrimas] = useState([]);
+  const [loadingMaterias, setLoadingMaterias] = useState(false);
   const [loading, setLoading] = useState(false);
   const [previewData, setPreviewData] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [notification, setNotification] = useState({ show: false, type: '', message: '' });
+
+  // Cargar materias primas al montar el componente
+  useEffect(() => {
+    cargarMateriasPrimas();
+  }, []);
+
+  const cargarMateriasPrimas = async () => {
+    setLoadingMaterias(true);
+    try {
+      const response = await materiaprimaService.obtenerTodas();
+      if (response.success && response.datos && response.datos.materias) {
+        setMateriasPrimas(response.datos.materias);
+      }
+    } catch (error) {
+      console.error('Error al cargar materias primas:', error);
+      showNotification('error', 'Error al cargar la lista de materias primas');
+    } finally {
+      setLoadingMaterias(false);
+    }
+  };
 
   // Función para mostrar notificaciones
   const showNotification = (type, message) => {
@@ -378,14 +401,23 @@ const Reportes = () => {
               <select
                 value={materiaPrima}
                 onChange={(e) => setMateriaPrima(e.target.value)}
-                className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+                disabled={loadingMaterias}
+                className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
               >
                 <option value="">Todas las materias primas</option>
-                <option value="pintura_roja">Pintura Roja</option>
-                <option value="pintura_azul">Pintura Azul</option>
-                <option value="disolvente">Disolvente</option>
-                <option value="resina">Resina</option>
+                {loadingMaterias ? (
+                  <option disabled>Cargando...</option>
+                ) : (
+                  materiasPrimas.map((materia) => (
+                    <option key={materia.id} value={materia.nombre}>
+                      {materia.nombre} ({materia.detalles})
+                    </option>
+                  ))
+                )}
               </select>
+              {loadingMaterias && (
+                <p className="text-gray-400 text-sm mt-1">Cargando materias primas...</p>
+              )}
             </div>
           )}
         </motion.div>
@@ -617,29 +649,113 @@ const ReportesPorFechas = ({ data }) => {
 const ReportesPorMaterias = ({ data }) => {
   console.log('Datos en ReportesPorMaterias:', data);
   
-  if (!data) {
+  if (!data || !data.ordenes || data.ordenes.length === 0) {
     return (
       <div className="text-center py-8">
-        <div className="text-gray-400 text-lg">No hay datos disponibles</div>
+        <div className="text-gray-400 text-lg">No se encontraron datos para la materia prima seleccionada</div>
       </div>
     );
   }
 
-  // Si los datos tienen la misma estructura que fechas, adaptamos
-  if (data.ordenes && Array.isArray(data.ordenes)) {
-    return <ReportesPorFechas data={data} />;
-  }
+  // Función para formatear fecha
+  const formatearFecha = (fechaISO) => {
+    const fecha = new Date(fechaISO);
+    return fecha.toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
-  // Fallback: mostrar estructura para debug
+  // Calcular estadísticas
+  const totalCantidad = data.ordenes.reduce((total, orden) => total + orden.cantidad, 0);
+  const totalOrdenes = data.ordenes.length;
+
   return (
     <div className="space-y-6">
+      {/* Resumen general */}
       <div className="bg-gray-700 p-4 rounded-lg">
         <h3 className="text-lg font-semibold text-white mb-2">
-          Estructura de datos recibida (Reporte por Materias):
+          Resumen del Reporte por Materia Prima
         </h3>
-        <pre className="text-sm text-gray-300 bg-gray-800 p-3 rounded overflow-x-auto">
-          {JSON.stringify(data, null, 2)}
-        </pre>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="text-center">
+            <p className="text-gray-300 text-sm">Total Órdenes</p>
+            <p className="font-bold text-blue-400 text-xl">{totalOrdenes}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-300 text-sm">Cantidad Total Usada</p>
+            <p className="font-bold text-yellow-400 text-xl">{totalCantidad.toFixed(2)}</p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-300 text-sm">Valor Total</p>
+            <p className="font-bold text-green-400 text-xl">${data.totalMateriales.toFixed(2)}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Lista de usos de la materia prima */}
+      <div className="space-y-4">
+        <h4 className="text-xl font-bold text-white">Uso de Materia Prima por Cliente</h4>
+        {data.ordenes.map((orden, index) => (
+          <div key={index} className="bg-gray-700 p-4 rounded-lg border-l-4 border-blue-500">
+            {/* Encabezado del uso */}
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h5 className="font-semibold text-lg text-white">
+                  {orden.cliente}
+                </h5>
+                <p className="text-gray-400 text-sm">
+                  Usuario: {orden.usuario} | Fecha de uso: {formatearFecha(orden.fechaUso)}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-gray-300 text-sm">Valor Total:</p>
+                <p className="font-bold text-green-400 text-lg">${orden.valorTotal.toFixed(2)}</p>
+              </div>
+            </div>
+            
+            {/* Detalles del uso */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-gray-800 p-3 rounded">
+              <div className="text-center">
+                <span className="text-gray-400 text-sm block">Cantidad Usada</span>
+                <span className="text-white font-bold text-lg">{orden.cantidad}</span>
+              </div>
+              <div className="text-center">
+                <span className="text-gray-400 text-sm block">Precio Unitario</span>
+                <span className="text-yellow-400 font-bold">${orden.valorUnitario.toFixed(2)}</span>
+              </div>
+              <div className="text-center">
+                <span className="text-gray-400 text-sm block">Subtotal</span>
+                <span className="text-green-400 font-bold">${orden.valorTotal.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Totales finales */}
+      <div className="bg-blue-900 bg-opacity-30 p-6 rounded-lg border border-blue-500">
+        <div className="text-center">
+          <h4 className="text-2xl font-bold text-white mb-2">
+            Resumen Total de la Materia Prima
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+            <div>
+              <p className="text-gray-300 text-sm">Cantidad Total Utilizada</p>
+              <p className="text-2xl font-bold text-yellow-400">{totalCantidad.toFixed(2)} unidades</p>
+            </div>
+            <div>
+              <p className="text-gray-300 text-sm">Valor Total Generado</p>
+              <p className="text-2xl font-bold text-green-400">${data.totalMateriales.toFixed(2)}</p>
+            </div>
+          </div>
+          <p className="text-gray-300 mt-4">
+            {totalOrdenes} {totalOrdenes === 1 ? 'orden utilizó' : 'órdenes utilizaron'} esta materia prima
+          </p>
+        </div>
       </div>
     </div>
   );
