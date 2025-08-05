@@ -1,0 +1,22 @@
+# version: "3.3"
+
+services:
+  postgres:
+    container_name: pintAutoSpring
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=pintAutoSpring
+      - POSTGRES_USER=Ariel
+      - POSTGRES_PASSWORD=admin123
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+  pgadmin:
+    container_name: pintautospring-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+    ports:
+      - 5050:80
