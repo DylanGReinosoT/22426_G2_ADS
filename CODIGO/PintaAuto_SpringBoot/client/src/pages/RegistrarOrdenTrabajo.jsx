@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import ordenTrabajoService from '../services/OrdenTrabajoService'
-import materiaprimaService from '../services/materiaPrimaService' // ✅ DESCOMENTADO y corregido
+import materiaprimaService from '../services/materiaPrimaService' 
 import clienteService from '../services/ClienteService'
 import { FiSave, FiArrowLeft, FiTruck, FiUser, FiTool, FiPackage, FiCheck, FiX } from 'react-icons/fi'
 

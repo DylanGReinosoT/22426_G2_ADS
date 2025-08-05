@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiDownload, FiArrowLeft, FiCalendar, FiBox, FiEye, FiAlertCircle, FiCheckCircle, FiX, FiFileText } from 'react-icons/fi';
 import reporteService from '../services/reporteService';
-import materiaprimaService from '../services/materiaprimaService';
+import materiaprimaService from '../services/materiaPrimaService' ;
 
 const Reportes = () => {
   const navigate = useNavigate();
@@ -48,6 +48,12 @@ const Reportes = () => {
 
   // Función para validar los datos del formulario - MEJORADA
   const validarFormulario = () => {
+    console.log('=== VALIDANDO FORMULARIO ===');
+    console.log('Filtro:', filtro);
+    console.log('Fecha inicio:', fechaInicio);
+    console.log('Fecha fin:', fechaFin);
+    console.log('Materia prima:', materiaPrima);
+    
     if (filtro === 'fechas') {
       if (!fechaInicio || !fechaFin) {
         showNotification('error', 'Por favor, selecciona ambas fechas');
@@ -76,20 +82,185 @@ const Reportes = () => {
         return false;
       }
     }
+    
+    console.log('Formulario válido ✓');
     return true;
   };
 
   // Función para descargar el archivo PDF
-  const descargarPDF = (blob, nombreArchivo) => {
+  const descargarPDFDesdePreview = async () => {
+  if (!previewData) {
+    showNotification('error', 'No hay datos para generar el PDF');
+    return;
+  }
+
+  setLoading(true);
+  try {
+    let pdfBlob;
+    let nombreArchivo;
+
+    if (filtro === 'fechas') {
+      // Usar los datos completos de la vista previa para generar PDF
+      pdfBlob = await reporteService.generarPDFFechas(previewData);
+      nombreArchivo = `reporte_fechas_${fechaInicio}_${fechaFin}.pdf`;
+    } else {
+      // Usar los datos completos de la vista previa para generar PDF
+      pdfBlob = await reporteService.generarPDFMaterias(previewData);
+      const materiaTexto = materiaPrima || 'todas_materias';
+      nombreArchivo = `reporte_materia_${materiaTexto}.pdf`;
+    }
+
+    
+    descargarPDF(pdfBlob, nombreArchivo);
+    showNotification('success', 'PDF descargado correctamente');
+    
+  } catch (error) {
+    console.error('Error al descargar PDF:', error);
+    
+    let mensajeError = 'Error al generar el PDF';
+    
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          mensajeError = 'Datos inválidos para generar el PDF';
+          break;
+        case 500:
+          mensajeError = 'Error interno del servidor al generar el PDF';
+          break;
+        default:
+          mensajeError = `Error del servidor (${error.response.status}) al generar PDF`;
+      }
+    } else if (error.request) {
+      mensajeError = 'No se pudo conectar con el servidor para generar el PDF';
+    }
+    
+    showNotification('error', mensajeError);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const generarYDescargarPDF = async () => {
+  if (!validarFormulario()) return;
+
+  setLoading(true);
+  console.log('=== INICIANDO DESCARGA DIRECTA DE PDF ===');
+  console.log('Filtro:', filtro);
+  console.log('Fechas:', { fechaInicio, fechaFin });
+  console.log('Materia prima:', materiaPrima);
+  
+  try {
+    let pdfBlob;
+    let nombreArchivo;
+    
+    if (filtro === 'fechas') {
+      console.log('Generando reporte por fechas...');
+      // Paso 1: Obtener los datos completos del reporte usando la función correcta
+      const reporteData = await reporteService.obtenerDatosReporteFechas(fechaInicio, fechaFin);
+      console.log('Datos del reporte obtenidos:', reporteData);
+      
+      // Paso 2: Enviar el reporte completo para generar PDF
+      console.log('Generando PDF...');
+      pdfBlob = await reporteService.generarPDFFechas(reporteData);
+      nombreArchivo = `reporte_fechas_${fechaInicio}_${fechaFin}.pdf`;
+    } else {
+      console.log('Generando reporte por materia prima...');
+      // Paso 1: Obtener los datos completos del reporte usando la función correcta
+      const reporteData = await reporteService.obtenerDatosReporteMaterias(materiaPrima || null);
+      console.log('Datos del reporte obtenidos:', reporteData);
+      
+      // Paso 2: Enviar el reporte completo para generar PDF
+      console.log('Generando PDF...');
+      pdfBlob = await reporteService.generarPDFMaterias(reporteData);
+      const materiaTexto = materiaPrima || 'todas_materias';
+      nombreArchivo = `reporte_materia_${materiaTexto}.pdf`;
+    }
+    
+    console.log('PDF generado, iniciando descarga...');
+    console.log('Blob type:', pdfBlob.type);
+    console.log('Blob size:', pdfBlob.size);
+    
+    // Descargar el PDF
+    descargarPDF(pdfBlob, nombreArchivo);
+    showNotification('success', 'PDF generado y descargado correctamente');
+    
+  } catch (error) {
+    console.error('=== ERROR AL GENERAR Y DESCARGAR PDF ===');
+    console.error('Error completo:', error);
+    console.error('Response data:', error.response?.data);
+    console.error('Status:', error.response?.status);
+    
+    let mensajeError = 'Error al generar el PDF';
+    
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          mensajeError = 'Parámetros inválidos para generar el PDF. Verifica las fechas o materia prima seleccionada.';
+          break;
+        case 404:
+          mensajeError = 'No se encontraron datos para generar el PDF con los parámetros especificados.';
+          break;
+        case 500:
+          mensajeError = 'Error interno del servidor al generar el PDF';
+          break;
+        default:
+          mensajeError = `Error del servidor (${error.response.status}) al generar PDF`;
+      }
+      
+      if (error.response.data && error.response.data.message) {
+        mensajeError = error.response.data.message;
+      }
+    } else if (error.request) {
+      mensajeError = 'No se pudo conectar con el servidor para generar el PDF';
+    } else {
+      mensajeError = `Error inesperado: ${error.message}`;
+    }
+    
+    showNotification('error', mensajeError);
+  } finally {
+    setLoading(false);
+  }
+};
+
+//  Función mejorada para descargar archivos PDF
+const descargarPDF = (blob, nombreArchivo) => {
+  try {
+    console.log('=== INICIANDO DESCARGA DE ARCHIVO ===');
+    console.log('Tipo de blob:', blob.type);
+    console.log('Tamaño del blob:', blob.size, 'bytes');
+    console.log('Nombre del archivo:', nombreArchivo);
+    
+    // Verificar que el blob sea válido
+    if (!blob || blob.size === 0) {
+      console.error('Blob inválido o vacío');
+      showNotification('error', 'El archivo PDF está vacío o es inválido');
+      return;
+    }
+    
+    // Verificar que sea un PDF
+    if (blob.type && !blob.type.includes('pdf') && !blob.type.includes('application/octet-stream')) {
+      console.warn('Tipo de archivo inesperado:', blob.type);
+    }
+    
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = nombreArchivo;
+    
+    //  Agregar al DOM temporalmente para Firefox
     document.body.appendChild(link);
     link.click();
+    
+    //  Limpiar recursos
     window.URL.revokeObjectURL(url);
     document.body.removeChild(link);
-  };
+    
+    console.log(`PDF descargado exitosamente: ${nombreArchivo}`);
+  } catch (error) {
+    console.error('Error al descargar PDF:', error);
+    showNotification('error', 'Error al descargar el archivo PDF: ' + error.message);
+  }
+};
 
   // Función para previsualizar los datos del reporte - MEJORADA
   const previsualizarReporte = async () => {
@@ -315,14 +486,26 @@ const Reportes = () => {
                   Cerrar
                 </button>
                 <button
-                  onClick={() => {
-                    setShowPreview(false);
-                    generarReporte();
-                  }}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2"
+                  onClick={descargarPDFDesdePreview}
+                  disabled={loading}
+                  className={`px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2 ${
+                    loading ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                 >
-                  <FiDownload className="text-sm" />
-                  Descargar PDF
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Generando...
+                    </>
+                  ) : (
+                    <>
+                      <FiDownload className="text-sm" />
+                      Descargar PDF
+                    </>
+                  )}
                 </button>
               </div>
             </motion.div>
@@ -404,7 +587,7 @@ const Reportes = () => {
                 disabled={loadingMaterias}
                 className="w-full bg-gray-800 border border-gray-700 rounded-md py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50"
               >
-                <option value="">Todas las materias primas</option>
+               
                 {loadingMaterias ? (
                   <option disabled>Cargando...</option>
                 ) : (
@@ -450,7 +633,7 @@ const Reportes = () => {
         </motion.button>
         
         <motion.button
-          onClick={generarReporte}
+          onClick={generarYDescargarPDF}
           disabled={loading}
           variants={buttonVariants}
           whileHover={loading ? {} : "hover"}
@@ -463,12 +646,12 @@ const Reportes = () => {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Generando...
+              Generando PDF...
             </>
           ) : (
             <>
-              <FiFileText className="h-5 w-5 mr-2" />
-              Generar Reporte
+              <FiDownload className="h-5 w-5 mr-2" />
+              Descargar PDF
             </>
           )}
         </motion.button>

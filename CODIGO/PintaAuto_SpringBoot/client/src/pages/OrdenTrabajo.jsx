@@ -109,6 +109,9 @@ const OrdenesTrabajo = () => {
   };
   
   const openEditModal = async (orden) => {
+    console.log('=== ABRIENDO MODAL DE EDICIÓN ===');
+    console.log('Orden a editar:', orden);
+    
     setEditingOrden(orden);
     
     // Cargar datos necesarios si no están cargados
@@ -117,27 +120,44 @@ const OrdenesTrabajo = () => {
 
     await new Promise(resolve => setTimeout(resolve, 100));
     
-    // Preparar materias primas seleccionadas
+    // Preparar materias primas seleccionadas con mejor inicialización
     const materiasSeleccionadas = [];
-    if (orden.materiasPrimasYcantidades) {
+    if (orden.materiasPrimasYcantidades && Object.keys(orden.materiasPrimasYcantidades).length > 0) {
+      console.log('Materias primas encontradas en la orden:', orden.materiasPrimasYcantidades);
+      
       for (const [materiaPrimaId, cantidad] of Object.entries(orden.materiasPrimasYcantidades)) {
-        materiasSeleccionadas.push({
+        const materiaFormateada = {
           materiaPrimaId: parseInt(materiaPrimaId),
-          cantidad: cantidad
-        });
+          cantidad: parseFloat(cantidad) || 0
+        };
+        materiasSeleccionadas.push(materiaFormateada);
+        console.log(`Materia agregada: ID=${materiaPrimaId}, Cantidad=${cantidad}`, materiaFormateada);
       }
+    } else {
+      console.log('No se encontraron materias primas en la orden');
     }
+    
+    console.log('Materias seleccionadas procesadas:', materiasSeleccionadas);
     
     // Configurar datos del formulario
     setFormData({
       titulo: orden.titulo || '',
       descripcion: orden.descripcion || '',
       vehiculo: orden.vehiculo || '',
-      clienteId: orden.cliente?.id || '',
+      clienteId: orden.cliente?.id || '', // Mantenemos para referencia pero no se editará
       materiasPrimasYcantidades: orden.materiasPrimasYcantidades || {}
     });
     
     setSelectedMaterias(materiasSeleccionadas);
+    
+    // Log final para verificar el estado
+    console.log('Form data configurado:', {
+      titulo: orden.titulo,
+      descripcion: orden.descripcion,
+      vehiculo: orden.vehiculo,
+      clienteId: orden.cliente?.id
+    });
+    
     setShowEditModal(true);
   };
   
@@ -149,47 +169,56 @@ const OrdenesTrabajo = () => {
     }));
   };
   
+  // Las materias primas están bloqueadas, estas funciones ya no se usan
+  // pero las mantenemos por si se necesitan en el futuro
   const agregarMateriaPrima = () => {
-    setSelectedMaterias(prev => [...prev, { materiaPrimaId: '', cantidad: 0 }]);
+    // Función deshabilitada - materias primas bloqueadas
+    console.log('Función deshabilitada: Las materias primas no se pueden modificar');
   };
   
   const eliminarMateriaPrima = (index) => {
-    setSelectedMaterias(prev => prev.filter((_, i) => i !== index));
+    // Función deshabilitada - materias primas bloqueadas
+    console.log('Función deshabilitada: Las materias primas no se pueden modificar');
+  };
+  
+  const validarMateriasSecionadas = () => {
+    // Ya no necesitamos validar materias primas porque están bloqueadas
+    return true;
   };
   
   const handleMateriaChange = (index, field, value) => {
-    setSelectedMaterias(prev => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
+    // Función deshabilitada - materias primas bloqueadas
+    console.log('Función deshabilitada: Las materias primas no se pueden modificar');
   };
   
   const handleSubmitEdit = async (e) => {
     e.preventDefault();
+    
+    console.log('=== INICIANDO ACTUALIZACIÓN (SOLO CAMPOS EDITABLES) ===');
+    console.log('Form data a enviar:', formData);
+    
     setSubmitting(true);
     
     try {
-      // Convertir materias seleccionadas a formato del backend
-      const materiasPrimasMap = {};
-      selectedMaterias.forEach(materia => {
-        if (materia.materiaPrimaId && materia.cantidad > 0) {
-          materiasPrimasMap[materia.materiaPrimaId] = parseFloat(materia.cantidad);
-        }
-      });
-      
+      // Solo enviar los campos que se pueden editar (sin materias primas)
       const dataToSend = {
         titulo: formData.titulo,
         descripcion: formData.descripcion,
         vehiculo: formData.vehiculo,
-        clienteId: parseInt(formData.clienteId),
+        clienteId: editingOrden.cliente?.id, // Usar el cliente existente (no editable)
         usuarioId: editingOrden.usuario?.id, // Mantener el usuario actual
-        materiasPrimasYcantidades: materiasPrimasMap
+        materiasPrimasYcantidades: editingOrden.materiasPrimasYcantidades || {} // Mantener las materias existentes
       };
       
-      console.log('Enviando datos:', dataToSend);
+      console.log('=== DATOS A ENVIAR ===');
+      console.log('Datos completos:', dataToSend);
+      console.log('Materias primas (sin cambios):', dataToSend.materiasPrimasYcantidades);
       
       const response = await ordenTrabajoService.actualizar(editingOrden.id, dataToSend);
+      
+      console.log('=== RESPUESTA DEL SERVIDOR ===');
+      console.log('Response completa:', response);
+      console.log('Datos de la orden actualizada:', response.datos);
       
       // Actualizar la lista local
       setOrdenes(prev => 
@@ -200,13 +229,17 @@ const OrdenesTrabajo = () => {
       
       setShowEditModal(false);
       setEditingOrden(null);
+      setSelectedMaterias([]); // Limpiar materias seleccionadas
       
-      // Mostrar mensaje de éxito (opcional)
-      alert('Orden actualizada correctamente');
+      // Mostrar mensaje de éxito
+      alert('Orden actualizada correctamente (sin modificar materias primas)');
       
     } catch (error) {
-      console.error('Error al actualizar orden:', error);
-      alert('Error al actualizar la orden');
+      console.error('=== ERROR AL ACTUALIZAR ===');
+      console.error('Error completo:', error);
+      console.error('Respuesta del error:', error.response?.data);
+      console.error('Status del error:', error.response?.status);
+      alert('Error al actualizar la orden: ' + (error.response?.data?.message || error.message));
     } finally {
       setSubmitting(false);
     }
@@ -236,6 +269,11 @@ const OrdenesTrabajo = () => {
   
   cargarDatosIniciales();
 }, []);
+
+// Debug: Monitorear cambios en selectedMaterias
+useEffect(() => {
+  console.log('selectedMaterias cambió:', selectedMaterias);
+}, [selectedMaterias]);
 
   const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar esta orden?')) {
@@ -457,7 +495,7 @@ const OrdenesTrabajo = () => {
                   Materias Primas a usar
                 </h4>
                 
-                {/* ✅ NUEVO: Mostrar loading específico para materias */}
+                {/*  NUEVO: Mostrar loading específico para materias */}
                 {loadingMaterias ? (
                   <div className="flex justify-center items-center py-8">
                     <motion.div
@@ -540,7 +578,7 @@ const OrdenesTrabajo = () => {
           </motion.div>
         )}
       </AnimatePresence>
-                      {/* ✅ NUEVO MODAL DE EDICIÓN */}
+                      {/*  NUEVO MODAL DE EDICIÓN */}
                 <AnimatePresence>
                   {showEditModal && editingOrden && (
                     <motion.div
@@ -620,98 +658,87 @@ const OrdenesTrabajo = () => {
                           
                           <div>
                             <label className="block text-sm font-medium text-gray-300 mb-2">
-                              Cliente *
+                              Cliente (No editable)
                             </label>
-                            <select
-                              name="clienteId"
-                              value={formData.clienteId}
-                              onChange={handleFormChange}
-                              required
-                              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-purple-500 transition-colors"
-                            >
-                              <option value="">Seleccionar cliente</option>
-                              {clientes.map(cliente => (
-                                <option key={cliente.id} value={cliente.id}>
-                                  {cliente.nombre} {cliente.apellido} - {cliente.cedula}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="w-full px-3 py-2 bg-gray-800 border border-gray-500 rounded-lg text-gray-400 cursor-not-allowed">
+                              {editingOrden.cliente ? 
+                                `${editingOrden.cliente.nombre} ${editingOrden.cliente.apellido} - ${editingOrden.cliente.cedula}` : 
+                                'Cliente no disponible'
+                              }
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              El cliente no puede ser modificado una vez creada la orden
+                            </p>
                           </div>
                           
-                          {/* Materias Primas */}
+                          {/* Materias Primas - Solo lectura */}
                           <div>
                             <div className="flex justify-between items-center mb-4">
                               <h4 className="text-lg font-semibold bg-gradient-to-r from-purple-600 to-purple-800 bg-clip-text text-transparent">
-                                Materias Primas
+                                Materias Primas (No editables)
                               </h4>
-                              <motion.button
-                                type="button"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={agregarMateriaPrima}
-                                className="flex items-center gap-2 px-3 py-1 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition-colors"
-                              >
-                                <FiPlus /> Agregar
-                              </motion.button>
+                              <div className="text-xs text-gray-500 bg-gray-800 px-3 py-1 rounded-lg border border-gray-600">
+                                🔒 Bloqueado por seguridad
+                              </div>
                             </div>
                             
                             <div className="space-y-3">
-                              {selectedMaterias.map((materia, index) => (
-                                <motion.div
-                                  key={index}
-                                  initial={{ opacity: 0, y: 10 }}
-                                  animate={{ opacity: 1, y: 0 }}
-                                  className="flex gap-3 items-end bg-gray-800/50 p-3 rounded-lg border border-gray-600"
-                                >
-                                  <div className="flex-1">
-                                    <label className="block text-xs text-gray-400 mb-1">
-                                      Materia Prima
-                                    </label>
-                                    <select
-                                      value={materia.materiaPrimaId}
-                                      onChange={(e) => handleMateriaChange(index, 'materiaPrimaId', e.target.value)}
-                                      className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-purple-500"
+                              {selectedMaterias.length > 0 ? (
+                                selectedMaterias.map((materia, index) => {
+                                  // Encontrar el nombre de la materia prima
+                                  const materiaPrimaInfo = materiasPrimas.find(mp => mp.id === parseInt(materia.materiaPrimaId));
+                                  
+                                  return (
+                                    <motion.div
+                                      key={index}
+                                      initial={{ opacity: 0, y: 10 }}
+                                      animate={{ opacity: 1, y: 0 }}
+                                      className="flex gap-3 items-center bg-gray-800/30 p-3 rounded-lg border border-gray-600"
                                     >
-                                      <option value="">Seleccionar...</option>
-                                      {Array.isArray(materiasPrimas) && materiasPrimas.map(mp => (
-                                        <option key={mp.id} value={mp.id}>
-                                          {mp.nombre} ({mp.unidadMedida})
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </div>
-                                  
-                                  <div className="w-24">
-                                    <label className="block text-xs text-gray-400 mb-1">
-                                      Cantidad
-                                    </label>
-                                    <input
-                                      type="number"
-                                      value={materia.cantidad}
-                                      onChange={(e) => handleMateriaChange(index, 'cantidad', e.target.value)}
-                                      min="0"
-                                      step="1"
-                                      className="w-full px-2 py-1 bg-gray-700 border border-gray-600 rounded text-white text-sm focus:outline-none focus:border-purple-500"
-                                    />
-                                  </div>
-                                  
-                                  <motion.button
-                                    type="button"
-                                    whileHover={{ scale: 1.1 }}
-                                    whileTap={{ scale: 0.9 }}
-                                    onClick={() => eliminarMateriaPrima(index)}
-                                    className="p-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                                  >
-                                    <FiX size={16} />
-                                  </motion.button>
-                                </motion.div>
-                              ))}
-                              
-                              {selectedMaterias.length === 0 && (
+                                      <div className="flex-1">
+                                        <label className="block text-xs text-gray-400 mb-1">
+                                          Materia Prima
+                                        </label>
+                                        <div className="w-full px-2 py-1 bg-gray-800 border border-gray-500 rounded text-gray-400 text-sm cursor-not-allowed">
+                                          {materiaPrimaInfo ? 
+                                            `${materiaPrimaInfo.nombre} (${materiaPrimaInfo.unidadMedida})` : 
+                                            'Materia prima no encontrada'
+                                          }
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="w-32">
+                                        <label className="block text-xs text-gray-400 mb-1">
+                                          Cantidad
+                                        </label>
+                                        <div className="w-full px-2 py-1 bg-gray-800 border border-gray-500 rounded text-gray-400 text-sm cursor-not-allowed text-center">
+                                          {materia.cantidad || '0'}
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="w-8 flex justify-center">
+                                        <div className="p-1 bg-gray-600 text-gray-400 rounded cursor-not-allowed">
+                                          🔒
+                                        </div>
+                                      </div>
+                                    </motion.div>
+                                  );
+                                })
+                              ) : (
                                 <div className="text-center py-6 text-gray-400 border-2 border-dashed border-gray-600 rounded-lg">
-                                  No hay materias primas seleccionadas
+                                  No hay materias primas asignadas a esta orden
                                 </div>
                               )}
+                              
+                              <div className="mt-4 p-3 bg-blue-900/20 border border-blue-600/30 rounded-lg">
+                                <div className="flex items-center gap-2 text-blue-300 text-sm">
+                                  <span>ℹ️</span>
+                                  <span className="font-medium">Información:</span>
+                                </div>
+                                <p className="text-blue-200 text-xs mt-1">
+                                  Las materias primas no pueden ser modificadas una vez creada la orden para mantener la integridad del inventario y los costos calculados.
+                                </p>
+                              </div>
                             </div>
                           </div>
                           

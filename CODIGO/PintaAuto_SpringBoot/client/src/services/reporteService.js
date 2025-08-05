@@ -50,6 +50,38 @@ const reporteService = {
 
   obtenerDatosReporteMaterias: async (nombreMateria = null) => {
     return reporteService.generarReporteMaterias(nombreMateria);
+  },
+
+  generarPDFFechas: async (reporteData) => {
+    try {
+      const response = await api.post('/reportes/fechas/pdf', reporteData, {
+        responseType: 'blob', //  Importante para archivos binarios
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      return response.data; // Retorna el blob del PDF
+    } catch (error) {
+      console.error('Error al generar PDF por fechas:', error);
+      throw error;
+    }
+  },
+
+  generarPDFMaterias: async (reporteData) => {
+    try {
+      const response = await api.post('/reportes/materia/pdf', reporteData, {
+        responseType: 'blob', //  Importante para archivos binarios
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      return response.data; // Retorna el blob del PDF
+    } catch (error) {
+      console.error('Error al generar PDF por materias:', error);
+      throw error;
+    }
   }
 }
 
