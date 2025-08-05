@@ -6,7 +6,7 @@ Las primeras versiones del código presentaban ciertas inconsistencias en su org
 
 > Anteriormente, no se contaba con una arquitectura definida, lo que resultaba en un código desordenado y poco mantenible.
 
-![Diagrama de Arquitectura](https://drive.google.com/file/d/1kMtoXU5dNxV9lmqfAT1-VI7HuVZuUwJs/view?usp=sharing)
+[Diagrama de Arquitectura](https://drive.google.com/file/d/1kMtoXU5dNxV9lmqfAT1-VI7HuVZuUwJs/view?usp=sharing)
 
 ## Versión Final (BL_V1.0.3)
 
