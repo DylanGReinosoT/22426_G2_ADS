@@ -1,28 +1,26 @@
-# Especificación de Requisitos de Software (SRS)
+# Matriz de Requisitos IREB (IREB)
 
-Este directorio contiene los documentos que forman parte del Elemento de Configuración del Software (ECS) relacionado con la especificación de requisitos del proyecto **PintAuto Inventory Management**.
+Este directorio contiene los documentos que forman parte del Elemento de Configuración del Software (ECS) relacionado con la matriz de requisitos basada en el estándar IREB para el proyecto **PintAuto Inventory Management**.
 
 ## Información del ECS
 
-- **Código del ECS:** SRS  
-- **Nombre del ECS:** Especificación de Requisitos de Software  
-- **Autor:** Ariel Guevara, Gavriel Reinoso, Micaela Salcedo
-- **Proyecto:** PintAuto Inventory Management  
-- **Línea base:** LBR - Línea Base Requisitos  
-- **Localización:** 22426_G2_ADS\PREGAME\1. ELICITACION\1.1 Especificación de RS  
-- **Tipo de ECS:** Documento (PDF)  
-- **Fecha de creación:** 08/05/2025  
-- **ID del proyecto:** 22426_G2_ADS  
+- **Código del ECS:** IREB
+- **Nombre del ECS:** Matriz de Requisitos IREB
+- **Autor:** Ariel Guevara, Gabriel Reinoso, Micaela Salcedo
+- **Proyecto:** PintAuto Inventory Management
+- **Línea base:** LBR - Línea Base Requisitos
+- **Localización:** D:\22426_G2_ADS\PREGAME\1. ELICITACION\1.2 Matriz IREB
+- **Tipo de ECS:** Documento (CSV/XLSX)
+- **Fecha de creación:** 08/05/2025
+- **ID del proyecto:** 22426_G2_ADS
 
+# Historial de Versiones de la Matriz IREB
 
-# Historial de Versiones del SRS
+| Versión                   | Fecha      | Responsable     | Aprobado por                                                  |
+| ------------------------- | ---------- | --------------- | ------------------------------------------------------------- |
+| `Matriz_IREB_V1.0.0.csv`  | 12/06/2025 | Ariel Guevara   | La versión fue aprobada por Gabriel Reinoso y Micaela Salcedo |
+| `Matriz_IREB_V1.0.1.xlsx` | 18/06/2025 | Gabriel Reinoso | La versión fue aprobada por Micaela Salcedo                   |
+| `Matriz_IREB_V1.0.3.xlsx` | 02/07/2025 | Micaela Salcedo | La versión fue aprobada por Ariel Guevara y Gabriel Reinoso   |
+| `Matriz_IREB_V1.0.4.xlsx` | 05/08/2025 | Gabriel Reinoso | La versión fue aprobada por Ariel Guevara                     |
 
-| Versión           | Fecha       | Responsable       | Aprobado por                         |
-|------------------|-------------|-------------------|--------------------------------------|
-| `SRS_V1.0.0.pdf` | 12/06/2025  | Ariel Guevara     | Gabriel Reinos y Micaela Salcedo     |
-| `SRS_V1.0.1.pdf` | 18/06/2025  | Gabriel Reinos    | Micaela Salcedo                      |
-| `SRS_V1.0.2.pdf` | 02/07/2025  | Micaela Salcedo   | Ariel Guevara y Gabriel Reinos      |
- 
-
-Estas versiones reflejan la evolución del documento conforme al proceso de análisis y validación de requisitos. Cada versión corresponde a una revisión validada en la línea base.
-
+Estas versiones reflejan la evolución del análisis de requisitos conforme al enfoque propuesto por el estándar IREB. Cada versión representa una validación formal en la línea base de requisitos.
