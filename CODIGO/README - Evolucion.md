@@ -20,9 +20,7 @@ En esta nueva versión del backlog se han implementado los siguientes ajustes:
 
 La siguiente imagen muestra el diagrama de arquitectura que sirvió como base para la reorganización y validación del código:
 
-![Diagrama de Arquitectura](DISEÑOS/1.2 Diseño de Arquitectura)
-
-> _Reemplaza `DISEÑOS/1.2 Diseño de Arquitectura` con la ruta exacta de tu imagen dentro del repositorio._
+[Diagrama Arquitectura](https://github.com/DylanGReinosoT/22426_G2_ADS/blob/main/DISE%C3%91OS/1.2%20Dise%C3%B1o%20de%20Arquitectura/ARQ_V1.0.2.pdf)
 
 Puedes revisar también el diagrama del código en el siguiente enlace:
 
