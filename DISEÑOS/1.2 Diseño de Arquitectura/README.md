@@ -1,3 +1,7 @@
-# _22426_G2_ADS
-📄 Consulta la [documentación](PREGAME/).
+# 📌 Versiones y Variantes
 
+| **Código del ECS** | **Descripción del ECS**              | **Versión/Variante** | **Fecha de creación** | **Autor(es)**                                   | **Localización**                                   | **Observaciones**                                             | **Variante de requisitos de usuario** | **Variante de plataforma** |
+| ------------------ | ------------------------------------ | -------------------- | --------------------- | ----------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------- | ------------------------------------- | -------------------------- |
+| ARQ                | Arquitectura 3 capas para el sistema | V1.0.0               | 18/07/2025            | Ariel Guevara, Gabriel Reinoso, Micaela Salcedo | D:\22426_G2_ADS\DISEÑOS\1.2 Diseño de Arquitectura | Primera versión de la arquitectura del proyecto para PintAuto | Español                               | Windows 11                 |
+| ARQ                | Arquitectura 3 capas para el sistema | V1.0.1               | 22/07/2025            | Ariel Guevara, Gabriel Reinoso, Micaela Salcedo | D:\22426_G2_ADS\DISEÑOS\1.2 Diseño de Arquitectura | Se implementó el uso correcto de la sintaxis                  | Español                               | Windows 11                 |
+| ARQ                | Arquitectura 3 capas para el sistema | V1.0.2               | 24/07/2025            | Ariel Guevara, Gabriel Reinoso, Micaela Salcedo | D:\22426_G2_ADS\DISEÑOS\1.2 Diseño de Ar           |
