@@ -8,10 +8,11 @@ import com.pintaauto.inventory.entity.Usuario;
 import com.pintaauto.inventory.service.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,12 +26,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UsuarioController.class)
+@ExtendWith(MockitoExtension.class)
 public class UsuarioControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private UsuarioService usuarioService;
 
     @Autowired
@@ -41,8 +43,6 @@ public class UsuarioControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        
         // Configurar datos de prueba
         usuarioResponseDTO = new UsuarioResponseDTO();
         usuarioResponseDTO.setId(1L);

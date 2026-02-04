@@ -8,10 +8,11 @@ import com.pintaauto.inventory.dto.OrdenTrabajoResponseDTO;
 import com.pintaauto.inventory.service.OrdenTrabajoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockitoAnnotations;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,12 +30,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(OrdenTrabajoController.class)
+@ExtendWith(MockitoExtension.class)
 public class OrdenTrabajoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @Mock
     private OrdenTrabajoService ordenTrabajoService;
 
     @Autowired
@@ -45,8 +47,6 @@ public class OrdenTrabajoControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        
         // Configurar materias primas de prueba
         Map<Long, Double> materiasPrimas = new HashMap<>();
         materiasPrimas.put(1L, 5.0);
