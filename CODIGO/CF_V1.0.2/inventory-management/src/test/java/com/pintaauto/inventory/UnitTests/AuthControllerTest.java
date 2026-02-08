@@ -10,30 +10,33 @@ import com.pintaauto.inventory.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AuthController.class)
+/**
+ * Pruebas unitarias para AuthController
+ * Utiliza MockMvc setup manual con @InjectMocks
+ */
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
     @Mock
     private AuthService authService;
 
-    @Autowired
+    @InjectMocks
+    private AuthController controller;
+
     private ObjectMapper objectMapper;
 
     private LoginRequestDTO loginRequestDTO;
@@ -41,6 +44,12 @@ public class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
+        // Configurar MockMvc con @InjectMocks
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        // Inicializar ObjectMapper
+        objectMapper = new ObjectMapper();
+
         // Configurar datos de prueba
         loginRequestDTO = new LoginRequestDTO();
         loginRequestDTO.setEmail("admin@pintaauto.com");

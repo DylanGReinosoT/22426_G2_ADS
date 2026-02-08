@@ -9,12 +9,13 @@ import com.pintaauto.inventory.service.ClienteService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -29,17 +30,22 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ClienteController.class)
+/**
+ * Pruebas unitarias para ClienteController
+ * Utiliza MockMvc setup manual con @InjectMocks
+ */
 @ExtendWith(MockitoExtension.class)
+@WithMockUser
 public class ClienteControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
     @Mock
     private ClienteService clienteService;
 
-    @Autowired
+    @InjectMocks
+    private ClienteController controller;
+
     private ObjectMapper objectMapper;
 
     private ClienteResponseDTO clienteResponseDTO;
@@ -47,6 +53,12 @@ public class ClienteControllerTest {
 
     @BeforeEach
     void setUp() {
+        // Configurar MockMvc con @InjectMocks
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        // Inicializar ObjectMapper
+        objectMapper = new ObjectMapper();
+
         // Configurar datos de prueba
         clienteResponseDTO = new ClienteResponseDTO();
         clienteResponseDTO.setId(1L);
