@@ -1,0 +1,6 @@
+projectKey=TestingFrontInventario
+serverUrl=http://localhost:9000
+serverVersion=25.12.0.117093
+dashboardUrl=http://localhost:9000/dashboard?id=TestingFrontInventario
+ceTaskId=2da46de5-61fc-4775-8b90-08a1b78714b4
+ceTaskUrl=http://localhost:9000/api/ce/task?id=2da46de5-61fc-4775-8b90-08a1b78714b4
