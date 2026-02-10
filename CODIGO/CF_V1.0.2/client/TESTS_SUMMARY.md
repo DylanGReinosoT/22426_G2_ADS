@@ -111,3 +111,111 @@ Ver [TESTING_GUIDE.md](TESTING_GUIDE.md) para más detalles sobre:
 - Mejores prácticas
 - Ejemplos avanzados
 - Troubleshooting
+
+## 📊 Análisis de Cobertura de Pruebas (Code Coverage)
+
+Este proyecto frontend, desarrollado con React JS, cuenta con pruebas unitarias ejecutadas mediante Jest y React Testing Library. A continuación, se presentan los resultados de cobertura obtenidos.
+
+### 🔹 Cobertura General
+
+| Métrica    | Porcentaje |
+|------------|------------|
+| Statements | 19.67%     |
+| Branches   | 12.32%     |
+| Functions  | 10%        |
+| Lines      | 20%        |
+
+La cobertura global es baja, con aproximadamente un 20% del código evaluado mediante pruebas automatizadas, lo que indica la necesidad de fortalecer la estrategia de testing.
+
+---
+
+### 🔹 Análisis por Módulos
+
+#### 📁 Contexts
+
+**Archivo:** `AuthContext.jsx`
+
+- Statements: 5.26%
+- Branches: 0%
+- Functions: 0%
+- Lines: 5.26%
+- Líneas no cubiertas: 11-82
+
+Este módulo presenta una cobertura muy baja, evidenciando la ausencia de pruebas para la gestión del contexto de autenticación.
+
+---
+
+#### 📁 Hooks
+
+**Archivo:** `useAuth.js`
+
+- Statements: 80%
+- Branches: 50%
+- Functions: 100%
+- Lines: 80%
+- Líneas no cubiertas: 8
+
+Este módulo posee la mejor cobertura del proyecto, reflejando buenas prácticas en la implementación de pruebas.
+
+---
+
+#### 📁 Pages
+
+**Archivo:** `Login.jsx`
+
+- Statements: 40%
+- Branches: 30.76%
+- Functions: 20%
+- Lines: 42.42%
+- Líneas no cubiertas: 55-57, 61-81, 146
+
+Presenta una cobertura media, siendo necesario reforzar las pruebas sobre los flujos de autenticación y validación.
+
+---
+
+#### 📁 Services
+
+**Archivos:** `api.js`, `authService.js`
+
+| Archivo        | Cobertura de Líneas |
+|----------------|---------------------|
+| api.js         | 20%                 |
+| authService.js | 3.44%               |
+
+Estos módulos presentan una cobertura críticamente baja, debido a la ausencia de pruebas con simulación de servicios externos.
+
+---
+
+### 🔹 Conclusiones
+
+- La cobertura general del proyecto es aproximadamente del 20%.
+- El módulo `useAuth.js` evidencia una adecuada estrategia de pruebas.
+- Los servicios y contextos requieren prioridad en su validación.
+- Existe riesgo de fallos no detectados en producción.
+
+---
+
+### 🔹 Recomendaciones
+
+Para mejorar la calidad del software, se recomienda:
+
+1. Implementar pruebas unitarias en los módulos:
+   - `AuthContext.jsx`
+   - `authService.js`
+   - `api.js`
+
+2. Aplicar herramientas de apoyo como:
+   - Jest
+   - React Testing Library
+   - MSW (Mock Service Worker)
+
+3. Incorporar pruebas para:
+   - Manejo de errores
+   - Casos límite
+   - Validaciones de formularios
+
+4. Establecer como meta mínima una cobertura del 70%.
+
+---
+
+
