@@ -177,6 +177,7 @@ public class OrdenTrabajoService{
             materiaPrima.getCantidad(),
             materiaPrima.getDetalles(),
             materiaPrima.getPrecioUnitario(),
+            materiaPrima.getCantidadMinima(),
             materiaPrima.getFechaIngreso(),
             materiaPrima.getCreatedAt(),
             materiaPrima.getUpdatedAt()
