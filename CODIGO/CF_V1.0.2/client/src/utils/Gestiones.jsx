@@ -15,6 +15,9 @@ const Gestiones = () => {
   const goToReportes = () => {
     navigate('/dashboard/reportes') 
   }
+  const goToOrdenCompra = () => {
+    navigate('/dashboard/orden-compra') 
+  }
 
   // Animaciones
   const containerVariants = {
@@ -106,6 +109,22 @@ const Gestiones = () => {
             </svg>
             <span className="text-lg">Orden de Trabajo</span>
             <span className="text-sm text-gray-300 mt-1">Control de producción</span>
+          </div>
+        </motion.button>
+
+        <motion.button
+          onClick={goToOrdenCompra}
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="tap"
+          className="flex-1 bg-gradient-to-br from-gray-800 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white font-semibold py-6 px-6 rounded-xl transition-all border border-gray-700 hover:border-red-500/30 shadow-lg"
+        >
+          <div className="flex flex-col items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mb-2 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span className="text-lg">Orden de Compra</span>
+            <span className="text-sm text-gray-300 mt-1">Gestión de proveedores</span>
           </div>
         </motion.button>
 

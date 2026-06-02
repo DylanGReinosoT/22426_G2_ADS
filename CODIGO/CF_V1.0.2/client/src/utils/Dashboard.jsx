@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { FiFileText, FiHome, FiPackage, FiPlusCircle, FiTruck, FiChevronDown, FiChevronUp, FiClipboard, FiList, FiUsers, FiLogOut } from 'react-icons/fi';
+import { FiFileText, FiHome, FiPackage, FiPlusCircle, FiTruck, FiChevronDown, FiChevronUp, FiClipboard, FiList, FiUsers, FiLogOut, FiShoppingCart } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -7,6 +7,7 @@ const Dashboard = () => {
   const [showMaterialSubmenu, setShowMaterialSubmenu] = useState(false);
   const [showWorkOrderSubmenu, setShowWorkOrderSubmenu] = useState(false);
   const [showClienteSubmenu, setShowClienteSubmenu] = useState(false);
+  const [showOrdenCompraSubmenu, setShowOrdenCompraSubmenu] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
 
@@ -15,6 +16,7 @@ const Dashboard = () => {
     setShowMaterialSubmenu(false);
     setShowWorkOrderSubmenu(false);
     setShowClienteSubmenu(false);
+    setShowOrdenCompraSubmenu(false);
   }, [location.pathname]);
 
   return (
@@ -221,6 +223,62 @@ const Dashboard = () => {
                       >
                         <FiPlusCircle size={16} className="text-red-400" />
                         <span>Registro</span>
+                      </Link>
+                    </li>
+                  </motion.ul>
+                )}
+              </AnimatePresence>
+            </li>
+
+            {/* Órdenes de Compra */}
+            <li>
+              <motion.div
+                whileHover={{ backgroundColor: 'rgba(185, 28, 28, 0.5)' }}
+                className="flex items-center justify-between p-3 rounded-md text-gray-300 cursor-pointer"
+                onClick={() => setShowOrdenCompraSubmenu(!showOrdenCompraSubmenu)}
+              >
+                <div className="flex items-center gap-3">
+                  <FiShoppingCart size={20} className="text-red-500" />
+                  <motion.span
+                    initial={{ opacity: 1 }}
+                    animate={{ opacity: isCollapsed ? 0 : 1 }}
+                    className="whitespace-nowrap"
+                  >
+                    Órdenes de Compra
+                  </motion.span>
+                </div>
+                {!isCollapsed && (
+                  showOrdenCompraSubmenu ?
+                    <FiChevronDown size={18} className="text-red-500" /> :
+                    <FiChevronUp size={18} className="text-red-500" />
+                )}
+              </motion.div>
+
+              <AnimatePresence>
+                {showOrdenCompraSubmenu && !isCollapsed && (
+                  <motion.ul
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden ml-8 space-y-2"
+                  >
+                    <li>
+                      <Link
+                        to="/dashboard/orden-compra"
+                        className="flex items-center gap-3 p-2 rounded-md text-gray-300 hover:bg-red-900/50 hover:text-white transition-all text-sm"
+                      >
+                        <FiList size={16} className="text-red-400" />
+                        <span>Listado</span>
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/dashboard/orden-compra/crear"
+                        className="flex items-center gap-3 p-2 rounded-md text-gray-300 hover:bg-red-900/50 hover:text-white transition-all text-sm"
+                      >
+                        <FiPlusCircle size={16} className="text-red-400" />
+                        <span>Nueva Orden</span>
                       </Link>
                     </li>
                   </motion.ul>

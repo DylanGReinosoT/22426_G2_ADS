@@ -10,12 +10,14 @@ import OrdenTrabajoForm from './pages/RegistrarOrdenTrabajo'
 import Cliente from './pages/Cliente'
 import RegistrarCliente from './pages/RegistrarCliente'
 import ReportesPDF from './pages/ReportesPDF'
+import OrdenCompra from './pages/OrdenCompra'
+import RegistrarOrdenCompra from './pages/RegistrarOrdenCompra'
 
 
 function App() {
   return (
     <Routes>
-      
+
       <Route path="/login" element={<Login />} />
       <Route path="/" element={<Inicio />} />
       <Route path="/gestiones" element={<Gestiones />} />
@@ -27,6 +29,8 @@ function App() {
         <Route path="cliente/registrar" element={<RegistrarCliente />} />
         <Route path="crear" element={<OrdenTrabajoForm/>} />
         <Route path="reportes" element={<ReportesPDF/>} />
+        <Route path="orden-compra" element={<OrdenCompra />} />
+        <Route path="orden-compra/crear" element={<RegistrarOrdenCompra />} />
       </Route>
     </Routes>
   )
