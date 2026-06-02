@@ -167,4 +167,20 @@ public class MateriaPrimaController {
                     .body(ApiResponse.error("Error al buscar materias"));
         }
     }
+
+    /**
+     * Obtiene las materias primas que están por debajo de su stock mínimo
+     */
+    @GetMapping("/bajo-minimo")
+    public ResponseEntity<ApiResponse<List<MateriaPrimaResponseDTO>>> obtenerBajoMinimo() {
+        try {
+            List<MateriaPrimaResponseDTO> materias = materiaPrimaService.obtenerBajoMinimo();
+            return ResponseEntity.ok(
+                    ApiResponse.success("Materias bajo mínimo obtenidas", materias)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.error("Error al obtener materias bajo mínimo"));
+        }
+    }
 }

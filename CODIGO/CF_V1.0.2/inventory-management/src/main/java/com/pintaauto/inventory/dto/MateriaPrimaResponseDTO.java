@@ -13,6 +13,7 @@ public class MateriaPrimaResponseDTO {
     private Double cantidad;
     private String detalles;
     private BigDecimal precioUnitario;
+    private Double cantidadMinima;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime fechaIngreso;
 
@@ -26,14 +27,15 @@ public class MateriaPrimaResponseDTO {
     public MateriaPrimaResponseDTO() {}
 
     public MateriaPrimaResponseDTO(Long id, String nombre, String unidadMedida, Double cantidad,
-                                   String detalles, BigDecimal precioUnitario, LocalDateTime fechaIngreso,
-                                   LocalDateTime createdAt, LocalDateTime updatedAt) {
+                                   String detalles, BigDecimal precioUnitario, Double cantidadMinima,
+                                   LocalDateTime fechaIngreso, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.nombre = nombre;
         this.unidadMedida = unidadMedida;
         this.cantidad = cantidad;
         this.detalles = detalles;
         this.precioUnitario = precioUnitario;
+        this.cantidadMinima = cantidadMinima;
         this.fechaIngreso = fechaIngreso;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -59,6 +61,9 @@ public class MateriaPrimaResponseDTO {
 
     public BigDecimal getPrecioUnitario() { return precioUnitario; }
     public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
+
+    public Double getCantidadMinima() { return cantidadMinima; }
+    public void setCantidadMinima(Double cantidadMinima) { this.cantidadMinima = cantidadMinima; }
 
     public LocalDateTime getFechaIngreso() { return fechaIngreso; }
     public void setFechaIngreso(LocalDateTime fechaIngreso) { this.fechaIngreso = fechaIngreso; }

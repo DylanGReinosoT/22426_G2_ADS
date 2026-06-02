@@ -39,6 +39,9 @@ public class MateriaPrima {
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
 
+    @Column(name = "cantidad_minima")
+    private Double cantidadMinima;
+
     @Column(name = "fecha_ingreso", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime fechaIngreso;
@@ -62,6 +65,9 @@ public class MateriaPrima {
         this.detalles = detalles;
         this.precioUnitario = precioUnitario;
     }
+
+    public Double getCantidadMinima() { return cantidadMinima; }
+    public void setCantidadMinima(Double cantidadMinima) { this.cantidadMinima = cantidadMinima; }
 
     // Getters y Setters
     public Long getId() { return id; }

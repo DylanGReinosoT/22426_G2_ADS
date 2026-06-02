@@ -36,8 +36,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/auth/**").permitAll()  // Permitir endpoints de autenticación
-                        .requestMatchers("/api/materia/**").authenticated()  // Requiere autenticación
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/materia/**").authenticated()
+                        .requestMatchers("/api/orden-compra/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -63,6 +63,7 @@ public class MateriaPrimaService {
         materia.setCantidad(requestDTO.getCantidad());
         materia.setDetalles(requestDTO.getDetalles());
         materia.setPrecioUnitario(requestDTO.getPrecioUnitario());
+        materia.setCantidadMinima(requestDTO.getCantidadMinima());
 
         MateriaPrima materiaActualizada = materiaPrimaRepository.save(materia);
         return convertirAResponseDTO(materiaActualizada);
@@ -85,8 +86,16 @@ public class MateriaPrimaService {
                 .collect(Collectors.toList());
     }
 
+    // Obtener materias primas por debajo del stock mínimo
+    @Transactional(readOnly = true)
+    public List<MateriaPrimaResponseDTO> obtenerBajoMinimo() {
+        return materiaPrimaRepository.findBajoMinimo().stream()
+                .map(this::convertirAResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     // Métodos de conversión
-    private MateriaPrimaResponseDTO convertirAResponseDTO(MateriaPrima materia) {
+    public MateriaPrimaResponseDTO convertirAResponseDTO(MateriaPrima materia) {
         return new MateriaPrimaResponseDTO(
                 materia.getId(),
                 materia.getNombre(),
@@ -94,6 +103,7 @@ public class MateriaPrimaService {
                 materia.getCantidad(),
                 materia.getDetalles(),
                 materia.getPrecioUnitario(),
+                materia.getCantidadMinima(),
                 materia.getFechaIngreso(),
                 materia.getCreatedAt(),
                 materia.getUpdatedAt()
@@ -101,12 +111,14 @@ public class MateriaPrimaService {
     }
 
     private MateriaPrima convertirAEntidad(MateriaPrimaRequestDTO requestDTO) {
-        return new MateriaPrima(
+        MateriaPrima materia = new MateriaPrima(
                 requestDTO.getNombre(),
                 requestDTO.getUnidadMedida(),
                 requestDTO.getCantidad(),
                 requestDTO.getDetalles(),
                 requestDTO.getPrecioUnitario()
         );
+        materia.setCantidadMinima(requestDTO.getCantidadMinima());
+        return materia;
     }
 }

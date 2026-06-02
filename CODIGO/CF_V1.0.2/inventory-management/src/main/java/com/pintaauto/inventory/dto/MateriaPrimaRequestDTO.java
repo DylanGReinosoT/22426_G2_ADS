@@ -24,6 +24,9 @@ public class MateriaPrimaRequestDTO {
     @DecimalMin(value = "0.0", inclusive = false, message = "El precio unitario debe ser mayor a 0")
     private BigDecimal precioUnitario;
 
+    @Min(value = 0, message = "La cantidad mínima debe ser mayor o igual a 0")
+    private Double cantidadMinima;
+
     // Constructores
     public MateriaPrimaRequestDTO() {}
 
@@ -51,4 +54,7 @@ public class MateriaPrimaRequestDTO {
 
     public BigDecimal getPrecioUnitario() { return precioUnitario; }
     public void setPrecioUnitario(BigDecimal precioUnitario) { this.precioUnitario = precioUnitario; }
+
+    public Double getCantidadMinima() { return cantidadMinima; }
+    public void setCantidadMinima(Double cantidadMinima) { this.cantidadMinima = cantidadMinima; }
 }

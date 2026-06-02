@@ -23,7 +23,11 @@ public interface MateriaPrimaRepository extends JpaRepository<MateriaPrima, Long
 
     // Buscar materias primas con cantidad menor a un valor específico
     @Query("SELECT m FROM MateriaPrima m WHERE m.cantidad < :cantidad")
-    List<MateriaPrima> findByCantidadMenorQue(@Param("cantidad") Integer cantidad);
+    List<MateriaPrima> findByCantidadMenorQue(@Param("cantidad") Double cantidad);
+
+    // Buscar materias primas que están por debajo de su stock mínimo configurado
+    @Query("SELECT m FROM MateriaPrima m WHERE m.cantidadMinima IS NOT NULL AND m.cantidadMinima > 0 AND m.cantidad <= m.cantidadMinima")
+    List<MateriaPrima> findBajoMinimo();
 
     // Buscar por nombre que contenga un texto (búsqueda parcial)
     @Query("SELECT m FROM MateriaPrima m WHERE LOWER(m.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")
