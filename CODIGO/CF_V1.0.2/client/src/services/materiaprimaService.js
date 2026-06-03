@@ -26,8 +26,12 @@ const materiaprimaService = {
         const response = await api.delete(`/materia/${id}`);
         return response.data;
     },
-    // Buscar por nombre
-  buscarPorNombre: (nombre) => api.get(`/materia/buscar?nombre=${nombre}`)
+    buscarPorNombre: (nombre) => api.get(`/materia/buscar?nombre=${nombre}`),
+
+  obtenerBajoMinimo: async () => {
+    const response = await api.get('/materia/bajo-minimo')
+    return response.data
+  },
 };
 
 export default materiaprimaService;

@@ -40,14 +40,11 @@ const RegistrarOrdenCompra = () => {
       try {
         const [mpRes, bajoRes] = await Promise.all([
           materiaprimaService.obtenerTodas(),
-          fetch('http://localhost:5000/api/materia/bajo-minimo', {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          }).then(r => r.json()),
+          materiaprimaService.obtenerBajoMinimo(),
         ])
         setMateriasPrimas(mpRes.datos?.materias || [])
         setBajominimo(bajoRes.datos || [])
       } catch {
-        // si bajo-minimo falla, continúa sin él
         try {
           const mpRes = await materiaprimaService.obtenerTodas()
           setMateriasPrimas(mpRes.datos?.materias || [])
